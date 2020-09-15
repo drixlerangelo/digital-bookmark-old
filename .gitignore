@@ -1,0 +1,11 @@
+.env
+/setup/ssl/cert.pem
+/setup/ssl/key.pem
+/setup/apache-host/*.conf
+/www/node_modules
+/www/public/hot
+/www/public/storage
+/www/storage/*.key
+/www/vendor
+/www/.env
+/www/.env.backup
