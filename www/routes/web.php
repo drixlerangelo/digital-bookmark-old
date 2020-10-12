@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'showAuth@PageController')->name('user.auth');
+
+Route::prefix('user')->group(function () {
+    Route::post('login', 'loginUser@UserController')->name('user.login');
 });
