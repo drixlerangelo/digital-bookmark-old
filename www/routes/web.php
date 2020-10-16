@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'showAuth@PageController')->name('user.auth');
+Route::get('/', [PageController::class, 'showAuth'])->name('user.auth');
 
 Route::prefix('user')->group(function () {
-    Route::post('login', 'loginUser@UserController')->name('user.login');
+    Route::post('login', [UserController::class, 'loginUser'])->name('user.login');
 });
