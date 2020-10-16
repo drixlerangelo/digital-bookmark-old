@@ -5,7 +5,16 @@ FROM php:7.3-apache
 WORKDIR /
 
 # update the system
-RUN apt-get update && apt-get upgrade
+RUN apt-get update -y && apt-get upgrade -y
 
 # enable ssl
 RUN a2enmod ssl
+
+# enable rewrite
+RUN a2enmod rewrite
+
+# restart apache
+RUN service apache2 restart
+
+# put composer inside the app
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
