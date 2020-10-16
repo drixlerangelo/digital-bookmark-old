@@ -8,14 +8,40 @@
  */
 namespace App\Http\Controllers;
 
+use App\Models\UserModel;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+
 class UserController
 {
+    /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    /**
+     * UserController constructor.
+     *
+     * @param UserModel $userModel
+     */
+    public function __construct(UserModel $userModel)
+    {
+        $this->userModel = $userModel;
+    }
+
     /**
      * Used to determine if the provided credentials are accepted
      *
      * @var bool
      */
     private $credentialsPassed = true;
+
+    /**
+     * The user that was found in the database
+     *
+     * @var UserModel|null
+     */
+    private $userFound = null;
 
     /**
      * Validation rules for the user
@@ -35,38 +61,18 @@ class UserController
     public function loginUser() : mixed
     {
         $validatedCredentials = request()->validate($this->validationRules);
+        $validatedCredentials = Arr::only($validatedCredentials, ['username', 'password']);
 
-        $this->validateUsername($validatedCredentials['username']);
-        $this->validatePassword($validatedCredentials['password']);
+        if (Auth::attempt($validatedCredentials) === true) {
+            // TODO: Add functionality after successful authentication
+            return true;
+        }
+
+        return false;
     }
 
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
-
-    /**
-     * Validates the username
-     *
-     * @param string $username
-     *
-     * @return bool
-     */
-    private function validateUsername(string $username) : bool
-    {
-        $userSearchResult = $this->findUser($username);
-        // TODO: add the functionality of validating the username
-    }
-
-    /**
-     * Validates the password
-     *
-     * @param string $password
-     *
-     * @return bool
-     */
-    private function validatePassword(string $password) : bool
-    {
-        // TODO: add the functionality of validating the password
-    }
 
     /**
      * Finds the user
@@ -77,7 +83,11 @@ class UserController
      */
     private function findUser(string $username) : bool
     {
-        // TODO: Finds the user
+        $this->userFound = $this->userModel
+            ->where('username', $username)
+            ->first();
+
+        return $this->userFound !== null;
     }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/

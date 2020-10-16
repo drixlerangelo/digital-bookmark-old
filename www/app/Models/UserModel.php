@@ -13,6 +13,20 @@ use Illuminate\Database\Eloquent\Model;
 class UserModel extends Model
 {
     /**
+     * Determines if they are columns relating to creation and modification datetime
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * Override table name
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
      * Creates the relationship between the user and logs
      */
     public function linkLog()
