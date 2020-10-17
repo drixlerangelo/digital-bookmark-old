@@ -1,6 +1,9 @@
 # use a apache with php docker image
 FROM php:7.3-apache
 
+# enable mysql for use in the application
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
 # set the directory to root
 WORKDIR /
 
@@ -15,6 +18,3 @@ RUN a2enmod rewrite
 
 # restart apache
 RUN service apache2 restart
-
-# put composer inside the app
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer

@@ -10,3 +10,4 @@
 /www/vendor
 /www/.env
 /www/.env.backup
+/setup/mysql/script.sql

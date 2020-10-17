@@ -3,7 +3,7 @@ version: '3.7'
 services:
     digital-bookmark:
         build:
-          context: .
+          context: ./setup/web-server
         container_name: digital-bookmark
         ports:
           - "${WEBSITE_HOST_HTTP_PORT}:80"
@@ -20,6 +20,8 @@ services:
         environment:
           MYSQL_ROOT_PASSWORD: ${WEBSITE_HOST_DB_PASSWORD}
           MYSQL_DATABASE: ${WEBSITE_HOST_DB_DATABASE}
+        volumes:
+          - ./setup/mysql:/docker-entrypoint-initdb.d
         ports:
           - ${WEBSITE_HOST_DB_PORT}:3306
         networks:
