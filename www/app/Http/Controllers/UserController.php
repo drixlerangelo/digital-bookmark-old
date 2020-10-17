@@ -8,14 +8,36 @@
  */
 namespace App\Http\Controllers;
 
+use App\Models\UserModel;
+use App\Traits\StructuredResponse;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+
 class UserController
 {
+    use StructuredResponse;
+
     /**
-     * Used to determine if the provided credentials are accepted
-     *
-     * @var bool
+     * @var UserModel
      */
-    private $credentialsPassed = true;
+    private $userModel;
+
+    /**
+     * UserController constructor.
+     *
+     * @param UserModel $userModel
+     */
+    public function __construct(UserModel $userModel)
+    {
+        $this->userModel = $userModel;
+    }
+
+    /**
+     * The user that was found in the database
+     *
+     * @var UserModel|null
+     */
+    private $userFound = null;
 
     /**
      * Validation rules for the user
@@ -32,41 +54,26 @@ class UserController
     /**
      * Handles the request where the user login
      */
-    public function loginUser() : mixed
+    public function loginUser()
     {
         $validatedCredentials = request()->validate($this->validationRules);
+        $validatedCredentials = Arr::only($validatedCredentials, ['username', 'password']);
 
-        $this->validateUsername($validatedCredentials['username']);
-        $this->validatePassword($validatedCredentials['password']);
+        if ($this->findUser($validatedCredentials['username']) && Auth::attempt($validatedCredentials)) {
+            $this->responseMsg = 'Login successful.';
+            $this->responseData['wasPassed'] = true;
+
+            return $this->makeResponse();
+        }
+
+        $this->setErrorStatus('Login unsuccessful.', ['password' => 'The password did not match.']);
+        $this->responseData['wasPassed'] = false;
+        $this->responseCode = 403;
+        return $this->makeResponse();
     }
 
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
-
-    /**
-     * Validates the username
-     *
-     * @param string $username
-     *
-     * @return bool
-     */
-    private function validateUsername(string $username) : bool
-    {
-        $userSearchResult = $this->findUser($username);
-        // TODO: add the functionality of validating the username
-    }
-
-    /**
-     * Validates the password
-     *
-     * @param string $password
-     *
-     * @return bool
-     */
-    private function validatePassword(string $password) : bool
-    {
-        // TODO: add the functionality of validating the password
-    }
 
     /**
      * Finds the user
@@ -75,9 +82,18 @@ class UserController
      *
      * @return bool
      */
-    private function findUser(string $username) : bool
+    private function findUser(string $username)
     {
-        // TODO: Finds the user
+        $this->userFound = $this->userModel
+            ->where('username', $username)
+            ->first();
+
+        if (($wasFound = $this->userFound !== null) === false) {
+            $this->setErrorStatus('No user was found.', ['username' => 'No user was found.']);
+            $this->responseCode = 401;
+        }
+
+        return $wasFound;
     }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
