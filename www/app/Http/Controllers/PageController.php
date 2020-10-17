@@ -8,14 +8,21 @@
  */
 namespace App\Http\Controllers;
 
+use App\Traits\StructuredResponse;
 
 class PageController
 {
+    use StructuredResponse;
+
     /**
      * Shows the sign-in/sign-up page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
      */
     public function showAuth()
     {
-        return view('auth');
+        $this->responseView = 'auth';
+
+        return $this->makeResponse();
     }
 }

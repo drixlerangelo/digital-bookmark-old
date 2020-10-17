@@ -9,11 +9,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
+use App\Traits\StructuredResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class UserController
 {
+    use StructuredResponse;
+
     /**
      * @var UserModel
      */
@@ -28,13 +31,6 @@ class UserController
     {
         $this->userModel = $userModel;
     }
-
-    /**
-     * Used to determine if the provided credentials are accepted
-     *
-     * @var bool
-     */
-    private $credentialsPassed = true;
 
     /**
      * The user that was found in the database
@@ -58,17 +54,22 @@ class UserController
     /**
      * Handles the request where the user login
      */
-    public function loginUser() : mixed
+    public function loginUser()
     {
         $validatedCredentials = request()->validate($this->validationRules);
         $validatedCredentials = Arr::only($validatedCredentials, ['username', 'password']);
 
-        if (Auth::attempt($validatedCredentials) === true) {
-            // TODO: Add functionality after successful authentication
-            return true;
+        if ($this->findUser($validatedCredentials['username']) && Auth::attempt($validatedCredentials)) {
+            $this->responseMsg = 'Login successful.';
+            $this->responseData['wasPassed'] = true;
+
+            return $this->makeResponse();
         }
 
-        return false;
+        $this->setErrorStatus('Login unsuccessful.', ['password' => 'The password did not match.']);
+        $this->responseData['wasPassed'] = false;
+        $this->responseCode = 403;
+        return $this->makeResponse();
     }
 
     /*----------------------------------------------Request Functions-------------------------------------------------*/
@@ -81,13 +82,18 @@ class UserController
      *
      * @return bool
      */
-    private function findUser(string $username) : bool
+    private function findUser(string $username)
     {
         $this->userFound = $this->userModel
             ->where('username', $username)
             ->first();
 
-        return $this->userFound !== null;
+        if (($wasFound = $this->userFound !== null) === false) {
+            $this->setErrorStatus('No user was found.', ['username' => 'No user was found.']);
+            $this->responseCode = 401;
+        }
+
+        return $wasFound;
     }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
