@@ -7,7 +7,9 @@
     @stack('page.style')
 </head>
 <body>
+    <div id="vue-element">
     @yield('page.content')
+    </div>
     @stack('page.script')
 </body>
 </html>
