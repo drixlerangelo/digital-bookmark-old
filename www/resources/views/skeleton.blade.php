@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('page.title')</title>
+    <style>
+        html, body, #vue-element {
+            height: 100%;
+        }
+    </style>
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
     @stack('page.style')
 </head>
 <body>
