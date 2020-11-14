@@ -1,0 +1,4 @@
+-- username: admin
+-- password: password
+INSERT INTO `users` (`id`, `username`, `password`) VALUES
+(1, 'admin', '$2y$10$WQ24qRnS/JIpS9YmBDSOvObKybswOBKe.89ezXs1FXj212nDpdNQG');
