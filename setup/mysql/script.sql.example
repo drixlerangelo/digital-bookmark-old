@@ -1,2 +1,0 @@
-# so that the web container can access the database container
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
