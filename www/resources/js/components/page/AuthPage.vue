@@ -2,19 +2,22 @@
     <div style="height: 100%;">
         <div class="hero-body">
             <div class="columns">
-                <div class="column is-10-mobile is-offset-1-mobile">
+                <div class="auth-form column is-4-desktop is-offset-4-desktop is-12-touch">
                     <div class="title">Digital Bookmark</div>
 
                     <div class="field">
                         <div class="control is-loading">
-                            <input class="input is-rounded" style="margin-top: 3em;" type="text" placeholder="Username">
+                            <input class="input is-rounded" type="text" placeholder="Username" ref="username">
+                            <div v-if="credentialsPassed === false" class="username-error">Email does not exist</div>
+                        </div>
+
+                        <div class="control is-loading">
+                            <input class="input is-rounded" type="password" placeholder="Password" ref="password">
+                            <div v-if="credentialsPassed === false" class="username-error">Password incorrect</div>
                         </div>
                     </div>
 
-
-                    <input class="input is-rounded" style="margin-top: 1em;" type="password" placeholder="Password">
-
-                    <button style="display: block; margin-left: auto; margin-right: auto; width: 25vw; margin-top: 1em; background-color: #BF2C1F;" class="button is-danger is-rounded">
+                    <button class="button action-button is-rounded" @click="submit">
                         {{ currentMode }}
                     </button>
 
@@ -55,6 +58,7 @@
                 loginStyle  : {},
                 signupStyle : {},
                 currentMode : 'LOGIN',
+                credentialsPassed : true,
 
                 //TODO: Pass this to CSS later
                 actionStyles : {
@@ -98,6 +102,25 @@
                 } else {
                     this.loginStyle = this.actionStyles['login'].inactive;
                 }
+            },
+
+            submit() {
+                this.credentialsPassed = this.credentialsPassed === false; // TODO: create validation
+                this.$refs.username.classList.toggle('is-danger', this.credentialsPassed === false);
+
+                if (this.credentialsPassed === true) {
+                    this.$refs.username.style.marginBottom = '3vh';
+                    this.$refs.username.style.borderColor = '#dbdbdb';
+
+                    this.$refs.password.style.marginBottom = '3vh';
+                    this.$refs.password.style.borderColor = '#dbdbdb';
+                } else {
+                    this.$refs.username.style.marginBottom = '0vh';
+                    this.$refs.username.style.borderColor = '#BF2C1F';
+
+                    this.$refs.password.style.marginBottom = '0vh';
+                    this.$refs.password.style.borderColor = '#BF2C1F';
+                }
             }
         },
 
@@ -107,20 +130,30 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+    @import '../../../css/authpage.scss';
+
     .hero-body {
         height: 100%;
         background: #BF2C1F !important;
     }
 
-    .column {
-        background: white;
-        margin-top: 4em;
-        border-radius: 15px;
+    .action-button {
+        color: white;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 1em;
+        background-color: #BF2C1F;
     }
 
-    .columns {
-        display: flex;
+    .action-button:hover {
+        background-color: #de3121
+    }
+
+    .column {
+        background: white;
+        border-radius: 15px;
     }
 
     .title {
@@ -130,40 +163,39 @@
         line-height: 56px;
         color: #BF1B28;
         text-align: center;
+        margin-top: 0.5em;
+        font-size: 220%;
+    }
+
+    .columns {
+        display: flex;
     }
 
     .input {
-        /* width: 25vw; */
         margin-left: auto;
         display: block;
         margin-right: auto;
+        margin-bottom: 3vh;
     }
 
-    @media screen and (min-width: 601px) {
-        .title {
-            margin-top: 0.5em;
-            font-size: 2em;
-        }
-
-        .signup-button {
-            border-top-left-radius: 0;
-            border-bottom-right-radius: 0;
-            font-size: 1.1em;
-            text-align: center;
-        }
-
-        .login-button {
-            border-bottom-left-radius: 0;
-            border-top-right-radius: 0;
-            font-size: 1.1em;
-            text-align: center;
-        }
+    .signup-button {
+        border-top-left-radius: 0;
+        border-bottom-right-radius: 0;
+        font-size: 1.1em;
+        text-align: center;
     }
 
-    @media screen and (max-width: 600px) {
-        .title {
-            margin-top: 35px;
-            font-size: 38px;
-        }
+    .login-button {
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0;
+        font-size: 1.1em;
+        text-align: center;
+    }
+
+    .username-error, .password-error {
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 3vh;
+        color: #BF2C1F;
     }
 </style>
