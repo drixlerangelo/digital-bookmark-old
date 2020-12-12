@@ -85,7 +85,11 @@ trait StructuredResponse
         }
 
         foreach ($errorData as $field => $message) {
-            $this->errorData[$field] = $message;
+            if (isset($this->errorData[$field]) === false) {
+                $this->errorData[$field] = [];
+            }
+
+            $this->errorData[$field][] = $message;
         }
     }
 }
