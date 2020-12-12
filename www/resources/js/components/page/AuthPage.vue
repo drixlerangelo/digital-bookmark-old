@@ -1,34 +1,41 @@
 <template>
     <div style="height: 100%;">
+        <user-form
+            :mode="currentMode"
+            :inputs="userData"
+            :submit="formSubmit"
+            @submit-done="resetForm"
+            @error-found="updateErrors"
+        ></user-form>
+
         <div class="hero-body">
             <div class="columns">
-                <div class="auth-form column is-4-desktop is-offset-4-desktop is-12-touch">
+                <div class="auth-form column is-4-desktop is-12-touch">
                     <div class="title">Digital Bookmark</div>
 
                     <div class="field">
-                        <div class="control is-loading">
-                            <input class="input is-rounded" type="text" placeholder="Username" ref="username">
-                            <div v-if="credentialsPassed === false" class="username-error">Email does not exist</div>
-                        </div>
-
-                        <div class="control is-loading">
-                            <input class="input is-rounded" type="password" placeholder="Password" ref="password">
-                            <div v-if="credentialsPassed === false" class="username-error">Password incorrect</div>
-                        </div>
+                        <username-field
+                            :external-errors="errors.username"
+                            :processing="inputsDisabled"
+                            @value-changed="handleInput"
+                        ></username-field>
+                        <password-field
+                            :external-errors="errors.password"
+                            :processing="inputsDisabled"
+                            @value-changed="handleInput"
+                        ></password-field>
                     </div>
 
-                    <button class="button action-button is-rounded" @click="submit">
-                        {{ currentMode }}
-                    </button>
+                    <action-button
+                        :current-mode="currentMode"
+                        :disabled="submitDisabled"
+                        @submit-start="submitForm"
+                    ></action-button>
 
-                    <div class="columns" style="margin-top: 1em;">
-                        <div class="signup-button column" @click="test('signup')" :style="signupStyle">
-                            SIGNUP
-                        </div>
-                        <div class="login-button column" @click="test('login')" :style="loginStyle">
-                            LOGIN
-                        </div>
-                    </div>
+                    <action-options
+                        :options="['SIGNUP', 'LOGIN']"
+                        @mode-change="switchMode"
+                    ></action-options>
                 </div>
             </div>
         </div>
@@ -39,8 +46,8 @@
     import ActionOptions from "../authpage/ActionOptions";
     import ActionButton from "../authpage/ActionButton";
     import PasswordField from "../authpage/PasswordField";
-    import UserForm from "../authpage/UserForm";
     import UsernameField from "../authpage/UsernameField";
+    import UserForm from "../authpage/UserForm";
 
     export default {
         name: "AuthPage",
@@ -49,106 +56,97 @@
             'action-options' : ActionOptions,
             'action-button'  : ActionButton,
             'password-field' : PasswordField,
-            'user-form'      : UserForm,
-            'username-field' : UsernameField
+            'username-field' : UsernameField,
+            'user-form'      : UserForm
         },
 
         data() {
             return {
-                loginStyle  : {},
-                signupStyle : {},
-                currentMode : 'LOGIN',
-                credentialsPassed : true,
-
-                //TODO: Pass this to CSS later
-                actionStyles : {
-                    login : {
-                        inactive: {
-                            'background': '#BF2C1F',
-                            'border-top-right-radius': 0,
-                            'margin-bottom': '2px',
-                            'margin-right': '2px',
-                            'color': '#F2F2F2'
-                        },
-                        active: {
-                            'background': '#FFF',
-                            'color': '#BF2C1F'
-                        }
-                    },
-                    signup : {
-                        inactive: {
-                            'background': '#BF2C1F',
-                            'border-top-left-radius': 0,
-                            'margin-bottom': '2px',
-                            'margin-left': '2px',
-                            'color': '#F2F2F2'
-                        },
-                        active: {
-                            'background': '#FFF',
-                            'color': '#BF2C1F'
-                        }
-                    }
-                }
+                currentMode    : '',
+                userData       : { username : '', password : '' },
+                formSubmit     : false,
+                submitDisabled : false,
+                inputsDisabled : false,
+                errors         : { username : [], password : [] },
+                inputPassed    : { username : true, password : true }
             };
         },
 
         methods : {
-            test(mode) {
-                this[mode + 'Style'] = this.actionStyles[mode].active;
-                this.currentMode = mode.toUpperCase();
+            /**
+             * Changes the mode based on what the user clicked
+             *
+             * @param {String} mode
+             */
+            switchMode(mode) {
+                this.currentMode = mode;
+            },
 
-                if (mode === 'login') {
-                    this.signupStyle = this.actionStyles['signup'].inactive;
-                } else {
-                    this.loginStyle = this.actionStyles['login'].inactive;
+            /**
+             * Gets the validation result from the inputs and
+             * determines if the inputs are allowed to be submitted
+             *
+             * @param {Object} data
+             */
+            handleInput(data) {
+                this.inputPassed[data.target] = data.passed;
+                this.userData[data.target] = data.value;
+                this.submitDisabled = !this.inputPassed.username || !this.inputPassed.password;
+            },
+
+            /**
+             * Submits the form and prevents the user from interacting with it
+             */
+            submitForm() {
+                this.formSubmit = true;
+                this.submitDisabled = true;
+                this.inputsDisabled = true;
+            },
+
+            /**
+             * When an error is found from the input,
+             * submitting is disabled and errors are shown
+             *
+             * @param {Object}
+             */
+            updateErrors({ errors, message }) {
+                this.formSubmit = false;
+                this.submitDisabled = false;
+                this.inputsDisabled = false;
+
+                if (message.length > 0) {
+                    this.errors.username = errors.username || [];
+                    this.errors.password = errors.password || [];
+                    this.submitDisabled = true;
                 }
             },
 
-            submit() {
-                this.credentialsPassed = this.credentialsPassed === false; // TODO: create validation
-                this.$refs.username.classList.toggle('is-danger', this.credentialsPassed === false);
+            /**
+             * Resets the form when login is successful,
+             * this also redirects the user to the home page
+             *
+             * @param {Object} authorization
+             */
+            resetForm(authorization) {
+                this.formSubmit = false;
+                this.userData = { username : '', password : '' };
+                this.errors = { username : [], password : [] };
 
-                if (this.credentialsPassed === true) {
-                    this.$refs.username.style.marginBottom = '3vh';
-                    this.$refs.username.style.borderColor = '#dbdbdb';
-
-                    this.$refs.password.style.marginBottom = '3vh';
-                    this.$refs.password.style.borderColor = '#dbdbdb';
-                } else {
-                    this.$refs.username.style.marginBottom = '0vh';
-                    this.$refs.username.style.borderColor = '#BF2C1F';
-
-                    this.$refs.password.style.marginBottom = '0vh';
-                    this.$refs.password.style.borderColor = '#BF2C1F';
+                if (authorization.granted) {
+                    alert(authorization.message);
+                    location.href = '/';
                 }
             }
-        },
-
-        created() {
-            this.test('login');
         }
     }
 </script>
 
-<style scoped lang="scss">
-    @import '../../../css/authpage.scss';
+<style scoped>
+    @import '../../../css/authpage.css';
 
     .hero-body {
         height: 100%;
         background: #BF2C1F !important;
-    }
-
-    .action-button {
-        color: white;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 1em;
-        background-color: #BF2C1F;
-    }
-
-    .action-button:hover {
-        background-color: #de3121
     }
 
     .column {
@@ -169,33 +167,5 @@
 
     .columns {
         display: flex;
-    }
-
-    .input {
-        margin-left: auto;
-        display: block;
-        margin-right: auto;
-        margin-bottom: 3vh;
-    }
-
-    .signup-button {
-        border-top-left-radius: 0;
-        border-bottom-right-radius: 0;
-        font-size: 1.1em;
-        text-align: center;
-    }
-
-    .login-button {
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 0;
-        font-size: 1.1em;
-        text-align: center;
-    }
-
-    .username-error, .password-error {
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 3vh;
-        color: #BF2C1F;
     }
 </style>
