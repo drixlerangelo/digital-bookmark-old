@@ -1,0 +1,85 @@
+/* for all resolutions */
+.text-field {
+    margin-left: auto;
+    display: block;
+    margin-right: auto;
+    margin-bottom: 3vh;
+}
+
+/* mobile: up to 768px */
+@media screen and (max-width: 768px) {
+    .action-button {
+        width: 100%;
+        margin-bottom: 5em;
+    }
+
+    .input-error {
+        width: 100%;
+    }
+}
+
+/* tablet: from 769px */
+@media screen and (min-width: 769px) {
+    .text-field, .action-button {
+        width: 80%;
+    }
+
+    .control.is-loading::after {
+        right: 15%;
+    }
+
+    .action-button {
+        margin-bottom: 5em;
+    }
+
+    .input-error {
+        width: 80%;
+    }
+}
+
+/* tablet: from 769px to 1022px */
+@media screen and (min-width: 769px) and (max-width: 1022px) {
+    .auth-form {
+        margin-top: 2em;
+    }
+}
+
+/* desktop: from 1023px */
+@media screen and (min-width: 1023px) {
+    .auth-form {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .title {
+        margin-bottom: 1em;
+    }
+}
+
+/* desktop: from 1023px to 1215px */
+@media screen and (min-width: 1023px) and (max-width: 1215px) {
+    /**/
+}
+
+/* widescreen: from 1216px */
+@media screen and (min-width: 1216px) {
+    /**/
+}
+
+/* widescreen: from 1216px to 1407px */
+@media screen and (min-width: 1216px) and (max-width: 1440px) {
+    /**/
+}
+
+/* fullhd: from 1440px */
+@media screen and (min-width: 1441px) {
+    .auth-form {
+        width: 20vw !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
