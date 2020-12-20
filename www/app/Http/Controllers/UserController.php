@@ -10,8 +10,9 @@ namespace App\Http\Controllers;
 
 use App\Models\UserModel;
 use App\Traits\StructuredResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class UserController
 {
@@ -39,25 +40,16 @@ class UserController
      */
     private $userFound = null;
 
-    /**
-     * Validation rules for the user
-     *
-     * @var array
-     */
-    private $validationRules = [
-        'username' => 'required|string|min:1',
-        'password' => 'required|string|min:1',
-    ];
-
     /*----------------------------------------------Request Functions-------------------------------------------------*/
 
     /**
      * Handles the request where the user login
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
      */
     public function loginUser()
     {
-        $validatedCredentials = request()->validate($this->validationRules);
-        $validatedCredentials = Arr::only($validatedCredentials, ['username', 'password']);
+        $validatedCredentials = $this->validateCredentials();
 
         if ($this->findUser($validatedCredentials['username']) && Auth::attempt($validatedCredentials)) {
             $this->responseMsg = 'Login successful.';
@@ -69,6 +61,35 @@ class UserController
         $this->setErrorStatus('Login unsuccessful.', ['password' => 'The password did not match.']);
         $this->responseData['wasPassed'] = false;
         $this->responseCode = 403;
+
+        return $this->makeResponse();
+    }
+
+    /**
+     * Handles the request for user registration
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     */
+    public function registerUser()
+    {
+        $validatedCredentials = $this->validateCredentials(true);
+
+        $this->userModel->username = $validatedCredentials['username'];
+        $this->userModel->password = Hash::make($validatedCredentials['password']);
+
+        $isSaved = $this->userModel->save();
+
+        if ($isSaved) {
+            $this->responseMsg = 'Registration successful.';
+            $this->responseData['wasPassed'] = true;
+
+            return $this->makeResponse();
+        }
+
+        $this->setErrorStatus('Registration unsuccessful.');
+        $this->responseData['wasPassed'] = false;
+        $this->responseCode = 500;
+
         return $this->makeResponse();
     }
 
@@ -94,6 +115,46 @@ class UserController
         }
 
         return $wasFound;
+    }
+
+    /**
+     * Removes the whitespace at the start and end of a string
+     * 
+     * @param array $columns
+     * 
+     * @param array $rules
+     * 
+     * @return array
+     */
+    private function cleanInputs($columns, $rules)
+    {
+        $inputs = request()->only($columns);
+        $inputs = array_map('trim', $inputs);
+
+        return Validator::make($inputs, $rules)->validate();
+    }
+
+    /**
+     * Validates the username and password
+     * 
+     * @param bool $atSignup
+     * 
+     * @return array
+     */
+    private function validateCredentials($atSignup = false)
+    {
+        $validations = [];
+        
+        $validations['username'] = config('validation.username.rules');
+        $validations['username'][] = 'regex:' . config('validation.username.regex');
+        if ($atSignup) {
+            $validations['username'][] = 'unique:' . config('validation.username.unique_to');
+        }
+
+        $validations['password'] = config('validation.password.rules');
+        $validations['password'][] = 'regex:' . config('validation.password.regex');
+
+        return $this->cleanInputs(['username', 'password'], $validations);
     }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/

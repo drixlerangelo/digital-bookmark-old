@@ -20,5 +20,6 @@ Route::middleware('guest')->group(function () {
 
     Route::prefix('user')->group(function () {
         Route::post('login', [UserController::class, 'loginUser'])->name('user.login');
+        Route::post('signup', [UserController::class, 'registerUser'])->name('user.signup');
     });
 });
