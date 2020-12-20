@@ -25,15 +25,15 @@ COPY ./database/scripts/ /home/user/database/scripts/
 # make a directory for saving the database
 RUN mkdir -p /home/user/database/storage/
 
-# make the applicable permissions
-RUN chown -R www-data:www-data /home/user/database/storage && \
-    chmod -R 755 /home/user/database/storage
-
 # change the directory to the database
 WORKDIR /home/user/database/storage
 
 # copy the database file
 COPY ./database/storage/digital_bookmark.db digital_bookmark.db
+
+# make the applicable permissions
+RUN chown -R www-data:www-data /home/user/database/storage && \
+    chmod -R 755 /home/user/database/storage
 
 # enable SQLite for use in the application
 RUN docker-php-ext-install pdo pdo_sqlite
@@ -49,6 +49,9 @@ RUN chown -R www-data:www-data /home/user/www/storage && \
     chown -R www-data:www-data /home/user/www/bootstrap/cache && \
     chmod -R 777 /home/user/www/storage && \
     chmod -R 777 /home/user/www/bootstrap/cache
+
+# create a new key when there's none
+RUN php artisan key:generate
 
 # create the structure of the database
 RUN php artisan migrate:fresh
