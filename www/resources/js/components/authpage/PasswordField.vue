@@ -7,12 +7,14 @@
         :placeholder="'Password'"
         :error-message="errorMessage"
         :validation-step="validateString"
+        :tooltip="tooltip"
         ref="textField"
     ></text-field>
 </template>
 
 <script>
     import TextField from "../parent/TextField";
+    import Validator from "../../lib/validation";
 
     export default {
         name: "PasswordField",
@@ -32,7 +34,8 @@
         data() {
             return {
                 errorMessage : '',
-                passed       : true
+                passed       : true,
+                tooltip      : 'Only alphanumeric and these characters are allowed:\n` ~ ! @ # $ % ^ & * ( ) - _ + = [ \] { } \\ | : ; \' " , < . > \/ ? '
             };
         },
 
@@ -45,19 +48,19 @@
              * @returns {Boolean}
              */
             validateString(password) {
-                if (password.length > 0) {
-                    this.passed = true;
-                    this.errorMessage = '';
-                } else {
-                    this.passed = false;
-                    this.errorMessage = 'The password field is required.';
-                }
+                const field = 'password';
+
+                Validator.setParams(field, password);
+                Validator.validateLength(8, 255);
+                Validator.validateFormat(/^[\w`~!@#$%^&*()-_+=[\]{}\\|:;\'",<.>\/?]*$/);
+
+                let {passed, message} = window.ErrorManager.getResult(field);
+                this.passed = passed;
+                this.errorMessage = message;
 
                 this.$emit('value-changed', {
-                    target  : 'password',
-                    value   : password,
-                    passed  : this.passed,
-                    message : this.errorMessage
+                    target  : field,
+                    value   : password
                 });
 
                 return this.passed;

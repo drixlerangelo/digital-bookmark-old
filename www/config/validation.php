@@ -8,7 +8,7 @@ return [
      * - It must not already exist in the table users
      */
     'username' => [
-        'rules'     => ['required', 'min:1', 'max:255'],
+        'rules'     => ['required', 'min:8', 'max:255'],
         'regex'     => '/^[a-z\d]*$/', 
         'unique_to' => 'users'
     ],
@@ -19,7 +19,7 @@ return [
      * - Allows for alphanumeric and some special characters but doesn't allow white spaces in between
      */
     'password' => [
-        'rules' => ['required', 'min:1', 'max:255'],
+        'rules' => ['required', 'min:8', 'max:255'],
         'regex' => '/^[\w`~!@#$%^&*()-_+=[\]{}\\|:;\'",<.>\/?]*$/'
     ],
 ];

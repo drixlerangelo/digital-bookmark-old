@@ -6,12 +6,14 @@
         :placeholder="'Username'"
         :error-message="errorMessage"
         :validation-step="validate"
+        :tooltip="tooltip"
         ref="textField"
     ></text-field>
 </template>
 
 <script>
     import TextField from "../parent/TextField";
+    import Validator from "../../lib/validation";
 
     export default {
         name: "UsernameField",
@@ -31,7 +33,8 @@
         data() {
             return {
                 errorMessage : '',
-                passed       : true
+                passed       : true,
+                tooltip      : 'Only alphanumeric characters are allowed.'
             };
         },
 
@@ -44,19 +47,19 @@
              * @returns {Boolean}
              */
             validate(username) {
-                if (username.length > 0) {
-                    this.passed = true;
-                    this.errorMessage = '';
-                } else {
-                    this.passed = false;
-                    this.errorMessage = 'The username field is required.';
-                }
+                const field = 'username';
+
+                Validator.setParams(field, username);
+                Validator.validateLength(8, 255);
+                Validator.validateFormat(/^[a-z\d]*$/);
+
+                let {passed, message} = window.ErrorManager.getResult(field);
+                this.passed = passed;
+                this.errorMessage = message;
 
                 this.$emit('value-changed', {
-                    target  : 'username',
-                    value   : username,
-                    passed  : this.passed,
-                    message : this.errorMessage
+                    target  : field,
+                    value   : username
                 });
 
                 return this.passed;
