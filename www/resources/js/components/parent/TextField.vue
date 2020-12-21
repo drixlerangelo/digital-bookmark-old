@@ -7,7 +7,9 @@
             :disabled="disabled"
             @keyup="validate"
             @paste="validate"
+            @change="validate"
             ref="input"
+            :title="tooltip"
         ><div v-if="validationPassed === false" class="input-error">{{ errorMessage }}</div>
     </div>
 </template>
@@ -20,6 +22,7 @@
             type           : { type : String, default : 'text' },
             placeholder    : { type : String, default : 'input here...' },
             errorMessage   : { type : String, default : '' },
+            tooltip        : { type : String, default : '' },
             validationStep : { type : Function, default() { return true; } },
             loading        : { type : Boolean },
             rounded        : { type : Boolean },

@@ -67,8 +67,7 @@
                 formSubmit     : false,
                 submitDisabled : false,
                 inputsDisabled : false,
-                errors         : { username : [], password : [] },
-                inputPassed    : { username : true, password : true }
+                errors         : { username : [], password : [] }
             };
         },
 
@@ -89,9 +88,8 @@
              * @param {Object} data
              */
             handleInput(data) {
-                this.inputPassed[data.target] = data.passed;
                 this.userData[data.target] = data.value;
-                this.submitDisabled = !this.inputPassed.username || !this.inputPassed.password;
+                this.submitDisabled = window.ErrorManager.getStatus();
             },
 
             /**
