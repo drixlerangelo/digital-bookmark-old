@@ -8,6 +8,7 @@
             @keyup="validate"
             @paste="validate"
             @change="validate"
+            @blur="validate"
             ref="input"
             :title="tooltip"
         ><div v-if="validationPassed === false" class="input-error">{{ errorMessage }}</div>

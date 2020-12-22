@@ -10,7 +10,6 @@
         }
     </style>
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
-    @stack('page.style')
 </head>
 <body>
     <div id="vue-element">
