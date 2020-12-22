@@ -17,11 +17,23 @@ class PageController
     /**
      * Shows the sign-in/sign-up page
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return mixed
      */
     public function showAuth()
     {
         $this->responseView = 'auth';
+
+        return $this->makeResponse();
+    }
+
+    /**
+     * Shows the homepage when logged in
+     *
+     * @return mixed
+     */
+    public function showHome()
+    {
+        $this->responseView = 'home';
 
         return $this->makeResponse();
     }

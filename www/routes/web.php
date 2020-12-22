@@ -16,10 +16,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [PageController::class, 'showAuth'])->name('user.auth');
+    Route::get('/', [PageController::class, 'showAuth'])->name('auth');
 
     Route::prefix('user')->group(function () {
-        Route::post('login', [UserController::class, 'loginUser'])->name('user.login');
-        Route::post('signup', [UserController::class, 'registerUser'])->name('user.signup');
+        Route::post('login', [UserController::class, 'loginUser'])->name('login');
+        Route::post('signup', [UserController::class, 'registerUser'])->name('signup');
+    });
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/home', [PageController::class, 'showHome'])->name('home');
+
+    Route::prefix('user')->group(function () {
+        Route::get('logout', [UserController::class, 'logoutUser'])->name('logout');
     });
 });

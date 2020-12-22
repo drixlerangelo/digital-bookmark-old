@@ -54,12 +54,18 @@ trait StructuredResponse
 
     /**
      * Creates the response
+     * 
+     * @param string $redirect
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    protected function makeResponse()
+    protected function makeResponse($redirect = '')
     {
-        if (request()->header('Accept') === 'application/json') {
+        if (is_string($redirect) && strlen($redirect) > 0) {
+            return redirect()->route($redirect);
+        }
+
+        if (request()->expectsJson()) {
             return response()->json([
                 'message' => $this->responseMsg,
                 'data'    => $this->responseData,

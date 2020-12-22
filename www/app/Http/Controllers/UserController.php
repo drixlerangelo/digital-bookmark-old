@@ -45,7 +45,7 @@ class UserController
     /**
      * Handles the request where the user login
      * 
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return mixed
      */
     public function loginUser()
     {
@@ -68,7 +68,7 @@ class UserController
     /**
      * Handles the request for user registration
      * 
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return mixed
      */
     public function registerUser()
     {
@@ -91,6 +91,22 @@ class UserController
         $this->responseCode = 500;
 
         return $this->makeResponse();
+    }
+
+    /**
+     * Handles the logout request
+     * 
+     * @return mixed
+     */
+    public function logoutUser()
+    {
+        Auth::logout();
+
+        request()->session()->invalidate();
+        
+        request()->session()->regenerateToken();
+
+        return $this->makeResponse('auth');
     }
 
     /*----------------------------------------------Request Functions-------------------------------------------------*/
