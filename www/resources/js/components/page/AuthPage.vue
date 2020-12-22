@@ -140,7 +140,7 @@
 </script>
 
 <style scoped>
-    @import '../../../css/authpage.css';
+    @import '../../../css/auth.css';
 
     .hero-body {
         height: 100%;

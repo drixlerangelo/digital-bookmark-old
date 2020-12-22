@@ -1,0 +1,72 @@
+/* for all resolutions */
+.navbar, .navbar-link, .navbar-item.has-dropdown:hover .navbar-link  {
+    background: #400707;
+    color: white;
+}
+
+.navbar-burger, .navbar-burger:hover {
+    color: #BF1B28;
+}
+
+.navbar-link:not(.is-arrowless)::after {
+    display: none;
+}
+
+.navbar-link {
+    padding-top: 14px;
+}
+
+.brand {
+    font-size: 20px;
+    color: #BF1B28;
+    font-family: 'Raleway';
+}
+
+/* mobile: up to 768px */
+@media screen and (max-width: 768px) {
+    .navbar-link::before {
+        content: 'Signed in as:';
+        color: #BF1B28;
+        font-size: 10px;
+        position: absolute;
+        top: 1px;
+    }
+}
+
+/* tablet: from 769px */
+@media screen and (min-width: 769px) {
+    /**/
+}
+
+/* tablet: from 769px to 1022px */
+@media screen and (min-width: 769px) and (max-width: 1022px) {
+    .navbar-link::before {
+        content: 'Signed in as:';
+        color: #BF1B28;
+    }
+}
+
+/* desktop: from 1023px */
+@media screen and (min-width: 1023px) {
+    /**/
+}
+
+/* desktop: from 1023px to 1215px */
+@media screen and (min-width: 1023px) and (max-width: 1215px) {
+    /**/
+}
+
+/* widescreen: from 1216px */
+@media screen and (min-width: 1216px) {
+    /**/
+}
+
+/* widescreen: from 1216px to 1407px */
+@media screen and (min-width: 1216px) and (max-width: 1440px) {
+    /**/
+}
+
+/* fullhd: from 1440px */
+@media screen and (min-width: 1441px) {
+    /**/
+}

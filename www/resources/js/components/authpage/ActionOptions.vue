@@ -56,7 +56,7 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
     .action-option {
         font-size: 1.1em;
         text-align: center;
