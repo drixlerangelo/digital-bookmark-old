@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReminderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,5 +30,9 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('user')->group(function () {
         Route::get('logout', [UserController::class, 'logoutUser'])->name('logout');
+    });
+
+    Route::prefix('reminder')->group(function () {
+        Route::get('check', [ReminderController::class, 'notifyReminder'])->name('remind');
     });
 });
