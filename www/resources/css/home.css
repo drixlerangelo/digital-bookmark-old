@@ -22,6 +22,16 @@
     font-family: 'Raleway';
 }
 
+.menu-reminder::before {
+    height: 8px;
+    width: 8px;
+    background-color: #BF1B28;
+    border-radius: 50%;
+    content: "";
+    position: absolute;
+    left: 4px;
+}
+
 /* mobile: up to 768px */
 @media screen and (max-width: 768px) {
     .navbar-link::before {
@@ -30,6 +40,11 @@
         font-size: 10px;
         position: absolute;
         top: 1px;
+    }
+
+    .menu-reminder::before {
+        top: 15px;
+        left: 10px;
     }
 }
 
@@ -44,11 +59,18 @@
         content: 'Signed in as:';
         color: #BF1B28;
     }
+
+    .menu-reminder::before {
+        top: 15px;
+        left: 10px;
+    }
 }
 
 /* desktop: from 1023px */
 @media screen and (min-width: 1023px) {
-    /**/
+    .navbar-item {
+        margin-left: 5px;
+    }
 }
 
 /* desktop: from 1023px to 1215px */
