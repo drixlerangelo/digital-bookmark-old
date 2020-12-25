@@ -22,14 +22,13 @@
     font-family: 'Raleway';
 }
 
-.menu-reminder::before {
-    height: 8px;
-    width: 8px;
+.menu-reminder::before, .navbar-reminder::after {
+    height: 8px !important;
+    width: 8px !important;
     background-color: #BF1B28;
-    border-radius: 50%;
+    border-radius: 50% !important;
     content: "";
     position: absolute;
-    left: 4px;
 }
 
 /* mobile: up to 768px */
@@ -45,6 +44,11 @@
     .menu-reminder::before {
         top: 15px;
         left: 10px;
+    }
+
+    .navbar-reminder::after {
+        left: 34px;
+        top: 9px;
     }
 }
 
@@ -64,12 +68,28 @@
         top: 15px;
         left: 10px;
     }
+
+    .navbar-reminder::after {
+        left: 34px;
+        top: 9px;
+    }
 }
 
 /* desktop: from 1023px */
 @media screen and (min-width: 1023px) {
     .navbar-item {
         margin-left: 5px;
+    }
+
+    .menu-reminder::before {
+        left: 4px;
+    }
+
+    .navbar-reminder::after {
+        display: inherit !important;
+        transform: none !important;
+        right: 1.5em !important;
+        border: 3px solid #BF1B28 !important;
     }
 }
 

@@ -17,7 +17,7 @@
                 <!-- TODO: Add other elements -->
 
                 <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link">
+                    <a class="navbar-link" ref="displayName">
                         {{ username }}
                     </a>
 
@@ -64,16 +64,40 @@
                 axios.get('/reminder/check')
                 .then(function ({ data }) {
                     const payload = data.data;
-                    this.$refs.goalSetup.classList.toggle('menu-reminder', payload.hasReminder === false);
+
+                    this.hasReminder = payload.hasReminder;
+                    this.changeTarget();
                 }.bind(this))
                 .catch(function ({ response }) {
                     this.$emit('error-found', response.data);
                 }.bind(this));
+            },
+
+            /**
+             * Changes the position of the indicator depending on the window width
+             */
+            changeTarget() {
+                const deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+                this.$refs.goalSetup.classList.toggle('menu-reminder', this.hasReminder === false);
+
+                let displayTarget = (deviceWidth >= 1023) ? 'displayName' : 'navbarBurger';
+
+                this.$refs.displayName.classList.remove('navbar-reminder');
+                this.$refs.navbarBurger.classList.remove('navbar-reminder');
+
+                this.$refs[displayTarget].classList.toggle('navbar-reminder', this.hasReminder === false);
             }
+        },
+
+        data() {
+            return {
+                hasReminder : true
+            };
         },
 
         created() {
             this.checkForReminders();
+            window.addEventListener('resize', this.changeTarget);
         }
     }
 </script>
