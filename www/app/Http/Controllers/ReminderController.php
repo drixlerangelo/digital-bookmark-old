@@ -40,7 +40,9 @@ class ReminderController extends Controller
      */
     public function notifyReminder()
     {
-        // TODO: Retrieve reminders that are currently active
+        $this->onlyJson = true;
+        $this->responseData['hasReminder'] = \Auth::user()->linkReminder->count() > 0;
+
         return $this->makeResponse();
     }
 

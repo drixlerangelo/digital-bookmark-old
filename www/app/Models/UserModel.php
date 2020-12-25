@@ -8,10 +8,14 @@
  */
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class UserModel extends Model
+class UserModel extends Authenticatable
 {
+    use HasFactory, Notifiable;
+
     /**
      * Determines if they are columns relating to creation and modification datetime
      *
@@ -39,6 +43,6 @@ class UserModel extends Model
      */
     public function linkReminder()
     {
-        // TODO: add the relationship between user and reminders
+        return $this->hasMany(ReminderModel::class, 'user_id');
     }
 }
