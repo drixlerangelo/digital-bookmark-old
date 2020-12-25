@@ -53,8 +53,15 @@ trait StructuredResponse
     protected $errorData = [];
 
     /**
+     * If the return should only be in JSON format
+     *
+     * @var bool
+     */
+    protected $onlyJson = false;
+
+    /**
      * Creates the response
-     * 
+     *
      * @param string $redirect
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Http\RedirectResponse
@@ -65,7 +72,7 @@ trait StructuredResponse
             return redirect()->route($redirect);
         }
 
-        if (request()->expectsJson()) {
+        if (request()->expectsJson() || $this->onlyJson) {
             return response()->json([
                 'message' => $this->responseMsg,
                 'data'    => $this->responseData,
