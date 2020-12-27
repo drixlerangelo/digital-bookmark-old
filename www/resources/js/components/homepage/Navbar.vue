@@ -67,6 +67,7 @@
 
                     this.hasReminder = payload.hasReminder;
                     this.changeTarget();
+                    this.$emit('reminder-checked', this.hasReminder);
                 }.bind(this))
                 .catch(function ({ response }) {
                     this.$emit('error-found', response.data);
