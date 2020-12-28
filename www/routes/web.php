@@ -3,6 +3,7 @@
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\StatusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,5 +35,9 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('reminder')->group(function () {
         Route::get('check', [ReminderController::class, 'notifyReminder'])->name('remind');
+    });
+
+    Route::prefix('status')->group(function () {
+        Route::get('all', [StatusController::class, 'fetchStatus'])->name('entries');
     });
 });

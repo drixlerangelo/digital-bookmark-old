@@ -40,6 +40,8 @@ class UserModel extends Authenticatable
 
     /**
      * Creates the relationship between the user and reminders
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function linkReminder()
     {
