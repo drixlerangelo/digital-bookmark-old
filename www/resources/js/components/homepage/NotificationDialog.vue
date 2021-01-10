@@ -47,6 +47,9 @@
                 this.text = '';
                 this.$refs.dialog.classList.add('slide-right');
                 this.$refs.dialog.classList.remove('slide-left');
+                setTimeout(function () {
+                    this.$refs.dialog.style.display = 'none';
+                }.bind(this), 1000); // 1 seconds
             }
         },
 
@@ -113,7 +116,7 @@
         }
         100% {
             opacity: 0;
-            -webkit-transform: translateX(100px);
+            -webkit-transform: translateX(10px);
         }
     }
 
@@ -124,14 +127,14 @@
         }
         100% {
             opacity: 0;
-            transform: translateX(100px);
+            transform: translateX(10px);
         }
     }
 
     @-webkit-keyframes fade-in-left {
         0% {
             opacity: 0;
-            -webkit-transform: translateX(100px);
+            -webkit-transform: translateX(10px);
         }
         100% {
             opacity: 0.95;
@@ -142,7 +145,7 @@
     @keyframes fade-in-left {
         0% {
             opacity: 0;
-            transform: translateX(100px);
+            transform: translateX(10px);
         }
         100% {
             opacity: 0.95;
