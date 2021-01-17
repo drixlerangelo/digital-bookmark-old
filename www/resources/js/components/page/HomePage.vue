@@ -2,44 +2,15 @@
     <div>
         <navbar :username="username" @reminder-checked="showGoalReminder"></navbar>
 
-        <div class="slider" ref="slider">
+        <div class="slider">
             <div class="slides" ref="slides">
-                <div class="slide" ref="todo" style="margin-right: 5%;">
-                    <div class="stage-overview">
-                        <span class="stage-title">Books To Read</span>
-                        <span class="stage-count">10</span>
-                    </div>
-                    <div class="book-list">
-                        <div class="book-item" v-for="(item) in 10" :key="item" :ref="'bookItem' + item">
-                            <div class="book-cover"></div>
-                            <div class="book-details">
-                                <div class="book-title">Lorem ipsum dolor</div>
-                                <div class="book-author">by Lorem Ipsum</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stage-bottom"></div>
-                </div>
-                <div class="slide" ref="doing">
-                    <div class="stage-overview">
-                        <span class="stage-title">Currently Reading</span>
-                        <span class="stage-count">0</span>
-                    </div>
-                    <div class="book-list"></div>
-                    <div class="stage-bottom"></div>
-                </div>
-                <div class="slide" ref="done" style="margin-left: 5%;">
-                    <div class="stage-overview">
-                        <span class="stage-title">Books Completed</span>
-                        <span class="stage-count">0</span>
-                    </div>
-                    <div class="book-list"></div>
-                    <div class="stage-bottom"></div>
-                </div>
+                <books-holder :entries="entries.todo" ref="todo" style="margin-right: 5%;">Books To Read</books-holder>
+                <books-holder :entries="entries.doing" ref="doing">Currently Reading</books-holder>
+                <books-holder :entries="entries.done" ref="done" style="margin-left: 5%;">Books Completed</books-holder>
             </div>
         </div>
 
-        <div style="text-align: center;" ref="nav">
+        <div style="text-align: center;">
             <a class="link" ref="todoNavigation" @click="focusOnStage('todo')"></a>
             <a class="link" ref="doingNavigation" @click="focusOnStage('doing')"></a>
             <a class="link" ref="doneNavigation" @click="focusOnStage('done')"></a>
@@ -52,6 +23,7 @@
 <script>
     import Navbar from '../homepage/Navbar.vue'
     import NotificationDialog from '../homepage/NotificationDialog';
+    import BooksHolder from '../homepage/BooksHolder';
 
     export default {
         name: "HomePage",
@@ -62,7 +34,8 @@
 
         components: {
             'navbar'       : Navbar,
-            'notification' : NotificationDialog
+            'notification' : NotificationDialog,
+            'books-holder' : BooksHolder
         },
 
         methods : {
@@ -81,7 +54,7 @@
              */
             getStagePositions() {
                 Object.keys(this.initPos).map(function (stage) {
-                    this.initPos[stage] = this.$refs[stage].offsetLeft;
+                    this.initPos[stage] = this.$refs[stage].$el.offsetLeft;
                 }.bind(this));
             },
 
@@ -130,12 +103,33 @@
                 if (hasReminder === false) {
                     this.$refs.notifDialog.openNotif('No goal set', 'You have not yet set a goal.');
                 }
+            },
+
+            /**
+             * Get the books with their corresponding status
+             */
+            loadEntries() {
+                axios.get('/status/all').then(function ({ data }) {
+                    const entries = data.data.entries;
+
+                    if (entries.length > 0) {
+                        for (let index = 0; index < entries.length; index ++) {
+                            let entry = entries[index];
+                            entry.logs = []; // Add this for the meantime while there's no log functionality
+
+                            this.entries[entry.status].push(entry);
+                        }
+                    }
+                }.bind(this)).catch(function ({ response }) {
+                    this.$emit('error-found', response.data);
+                }.bind(this));
             }
         },
 
         data() {
             return {
-                initPos : { todo : 0, doing : 0, done : 0 }
+                initPos : { todo : 0, doing : 0, done : 0 },
+                entries : { todo : [], doing : [], done : [] }
             };
         },
 
@@ -148,6 +142,8 @@
                 slide.addEventListener('touchmove', this.changeNavigation);
                 slide.addEventListener('touchend', this.changeNavigation);
             }.bind(this));
+
+            this.loadEntries();
         }
     }
 </script>

@@ -46,14 +46,6 @@
     scroll-behavior: smooth;
 }
 
-.slide {
-    scroll-snap-align: start;
-    flex-shrink: 0;
-    border-radius: 10px;
-    background: #BF2C1F;
-    color: white;
-}
-
 .slides::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -80,96 +72,20 @@
     background-color: #BF1B28;
 }
 
-.stage-overview {
-    padding-bottom: 6px;
-    border: 1px;
-    border-bottom-style: solid;
-    margin-bottom: 1em;
-    height: 10%;
-}
-
-.slide {
-    padding: 1em;
-    font-family: 'Roboto';
-}
-
-.stage-title {
-    font-size: 1.3em;
-    line-height: 1px;
-}
-
-.stage-count {
-    padding: 0px 6px 0px 6px;
-    background: #C4C4C4;
-    border-radius: 5px;
-    float: right;
-    min-width: 1.5em;
-    width: auto;
-    height: 1.5em;
-    text-align: center;
-}
-
-.book-list {
-    overflow-y: auto;
-    height: 85%;
-}
-
-.book-item {
-    background: #F2F2F2;
-    width: 97%;
-    height: 7em;
-    margin-top: 0.35em;
-    margin-bottom: 0.35em;
-    border: 1px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    display: flex;
-}
-
-.stage-bottom {
-    height: 4%;
-}
-
-.book-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.book-list::-webkit-scrollbar-track {
-    background: rgba(150, 150, 150, 0.4);
-}
-
-.book-list::-webkit-scrollbar-thumb {
-    background: rgba(229, 229, 229, 0.4);
-    border-radius: 50px;
-}
-
-.book-list::-webkit-scrollbar-thumb:hover, .book-list::-webkit-scrollbar-thumb:active {
-    background: rgba(130, 130, 130, 1);
-}
-
 .book-cover {
-        min-width: 4em;
-        height: auto;
-        background: #C4C4C4;
-        /* background: url('');  */ /* Use when there's a cover photo */
-        background-size: cover;
-        margin-left: 0.5em;
-        margin-right: 0.5em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+    min-width: 4em;
+    height: auto;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
-.book-details {
+.book-count, .book-time {
+    font-size: 9px;
     color: #BF1B28;
-    margin-top: 0.2em;
-}
-
-.book-title {
-    font-size: 14px;
-}
-
-.book-author {
-    font-size: 11px;
+    position: absolute;
+    bottom: 1em;
 }
 
 /* mobile: up to 768px */
@@ -199,6 +115,10 @@
 
     .stage-title {
         font-size: 1.5em;
+    }
+
+    .book-info {
+        width: 65%;
     }
 }
 
@@ -235,8 +155,16 @@
         font-size: 1.1em;
     }
 
-    .book-title {
-        font-size: 14px;
+    .book-info {
+        width: 50%;
+    }
+
+    .book-count {
+        bottom: 4em;
+    }
+
+    .book-time {
+        left: 0;
     }
 }
 
@@ -264,7 +192,9 @@
 
 /* desktop: from 1023px to 1215px */
 @media screen and (min-width: 1023px) and (max-width: 1215px) {
-    /**/
+    .book-info {
+        width: 60%;
+    }
 }
 
 /* widescreen: from 1216px */
@@ -279,6 +209,10 @@
     .slide {
         height: 26em;
     }
+
+    .book-info {
+        width: 65%;
+    }
 }
 
 /* fullhd: from 1440px */
@@ -290,5 +224,9 @@
 
     .slide {
         height: 50em;
+    }
+
+    .book-info {
+        width: 70%;
     }
 }
