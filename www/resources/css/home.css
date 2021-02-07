@@ -88,6 +88,15 @@
     bottom: 1em;
 }
 
+.stage-overview {
+    height: 10%;
+}
+
+.stage-title {
+    font-size: 1.3em;
+    line-height: 1px;
+}
+
 /* mobile: up to 768px */
 @media screen and (max-width: 768px) {
     .navbar-link::before {
@@ -120,6 +129,10 @@
     .book-info {
         width: 65%;
     }
+
+    .book-list {
+        height: 74%;
+    }
 }
 
 /* tablet: from 768px */
@@ -131,6 +144,10 @@
 
     .link {
         display: none;
+    }
+
+    .book-list {
+        height: 75%;
     }
 }
 
@@ -165,6 +182,10 @@
 
     .book-time {
         left: 0;
+    }
+
+    .stage-title {
+        font-size: 1em;
     }
 }
 
@@ -228,5 +249,13 @@
 
     .book-info {
         width: 70%;
+    }
+
+    .stage-overview {
+        height: 6%;
+    }
+
+    .book-list {
+        height: 86%;
     }
 }
