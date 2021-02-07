@@ -4,9 +4,25 @@
 
         <div class="slider">
             <div class="slides" ref="slides">
-                <books-holder :entries="entries.todo" ref="todo" style="margin-right: 5%;">Books To Read</books-holder>
-                <books-holder :entries="entries.doing" ref="doing">Currently Reading</books-holder>
-                <books-holder :entries="entries.done" ref="done" style="margin-left: 5%;">Books Completed</books-holder>
+                <books-holder
+                    :entries="entries.todo"
+                    stage="todo"
+                    ref="todo"
+                    style="margin-right: 5%;"
+                    @prompt-book-registration="prepareBookRegistration"
+                >Books To Read</books-holder>
+                <books-holder
+                    :entries="entries.doing"
+                    stage="doing"
+                    ref="doing"
+                    @prompt-book-registration="prepareBookRegistration"
+                >Currently Reading</books-holder>
+                <books-holder
+                    :entries="entries.done"
+                    stage="done"
+                    ref="done"
+                    style="margin-left: 5%;"
+                >Books Completed</books-holder>
             </div>
         </div>
 
@@ -123,6 +139,15 @@
                 }.bind(this)).catch(function ({ response }) {
                     this.$emit('error-found', response.data);
                 }.bind(this));
+            },
+
+            /**
+             * Shows a modal for book registration
+             *
+             * @param {String} stage
+             */
+            prepareBookRegistration(stage) {
+                // TODO: Show modal for book registration
             }
         },
 

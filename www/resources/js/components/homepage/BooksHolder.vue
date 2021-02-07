@@ -11,7 +11,11 @@
                 <book-row :book="book" :pos="index" :key="index"></book-row>
             </template>
         </div>
-        <div class="stage-bottom"></div>
+        <div class="stage-bottom">
+            <button v-if="stage !== 'done'" class="button show-book-form-button is-fullwidth" @click="showBookForm">
+                + Add New Book
+            </button>
+        </div>
     </div>
 </template>
 <script>
@@ -25,7 +29,17 @@
         },
 
         props : {
-            entries : { type : Array }
+            entries : { type : Array },
+            stage   : { type : String }
+        },
+
+        methods : {
+            /**
+             * Trigger for showing the book registration form
+             */
+            showBookForm() {
+                this.$emit('prompt-book-registration', this.stage);
+            }
         }
     }
 </script>
@@ -46,12 +60,6 @@
         border: 1px;
         border-bottom-style: solid;
         margin-bottom: 1em;
-        height: 10%;
-    }
-
-    .stage-title {
-        font-size: 1.3em;
-        line-height: 1px;
     }
 
     .stage-count {
@@ -67,7 +75,6 @@
 
     .book-list {
         overflow-y: scroll;
-        height: 85%;
     }
 
     .book-list::-webkit-scrollbar {
@@ -90,5 +97,17 @@
 
     .stage-bottom {
         height: 4%;
+        margin-top: 2%;
+    }
+
+    .show-book-form-button {
+        background-color: transparent;
+        border-color: #BF2C1F;
+        color: white;
+    }
+
+    .show-book-form-button:hover {
+        background-color: white;
+        color: #BF2C1F;
     }
 </style>
