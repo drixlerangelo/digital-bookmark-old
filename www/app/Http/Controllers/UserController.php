@@ -10,13 +10,14 @@ namespace App\Http\Controllers;
 
 use App\Models\UserModel;
 use App\Traits\StructuredResponse;
+use App\Traits\CleanedValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
 class UserController
 {
-    use StructuredResponse;
+    use StructuredResponse, CleanedValidation;
 
     /**
      * @var UserModel
@@ -44,7 +45,7 @@ class UserController
 
     /**
      * Handles the request where the user login
-     * 
+     *
      * @return mixed
      */
     public function loginUser()
@@ -67,7 +68,7 @@ class UserController
 
     /**
      * Handles the request for user registration
-     * 
+     *
      * @return mixed
      */
     public function registerUser()
@@ -95,7 +96,7 @@ class UserController
 
     /**
      * Handles the logout request
-     * 
+     *
      * @return mixed
      */
     public function logoutUser()
@@ -103,7 +104,7 @@ class UserController
         Auth::logout();
 
         request()->session()->invalidate();
-        
+
         request()->session()->regenerateToken();
 
         return $this->makeResponse('auth');
@@ -134,43 +135,28 @@ class UserController
     }
 
     /**
-     * Removes the whitespace at the start and end of a string
-     * 
-     * @param array $columns
-     * 
-     * @param array $rules
-     * 
-     * @return array
-     */
-    private function cleanInputs($columns, $rules)
-    {
-        $inputs = request()->only($columns);
-        $inputs = array_map('trim', $inputs);
-
-        return Validator::make($inputs, $rules)->validate();
-    }
-
-    /**
      * Validates the username and password
-     * 
+     *
      * @param bool $atSignup
-     * 
+     *
      * @return array
      */
     private function validateCredentials($atSignup = false)
     {
-        $validations = [];
-        
-        $validations['username'] = config('validation.username.rules');
-        $validations['username'][] = 'regex:' . config('validation.username.regex');
+        $this->selectedParams = ['username', 'password'];
+        $rules = $this->fetchRules();
+
+        $rules['username'][] = 'regex:' . config('validation.username.regex');
         if ($atSignup) {
-            $validations['username'][] = 'unique:' . config('validation.username.unique_to');
+            $rules['username'][] = 'unique:' . config('validation.username.unique_to');
         }
 
-        $validations['password'] = config('validation.password.rules');
-        $validations['password'][] = 'regex:' . config('validation.password.regex');
+        $rules['password'][] = 'regex:' . config('validation.password.regex');
 
-        return $this->cleanInputs(['username', 'password'], $validations);
+        $inputs = $this->prepareInputs();
+        $inputs = array_map('trim', $inputs);
+
+        return $this->conductTest($inputs, $rules);
     }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/

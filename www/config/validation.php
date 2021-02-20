@@ -38,4 +38,52 @@ return [
     'mode' => [
         'rules' => ['string', 'in:all,todo,doing,done']
     ],
+
+    /**
+     * NAME validation
+     * - This parameter is required and should be a string with a minimum of one character
+     */
+    'name' => [
+        'rules' => ['required', 'string', 'min:1'],
+    ],
+
+    /**
+     * AUTHOR validation
+     * - This parameter is required and should be a string with a minimum of one character
+     */
+    'author' => [
+        'rules' => ['required', 'string', 'min:1'],
+    ],
+
+    /**
+     * NUMPAGES validation
+     * - This parameter is required and should be an integer, starting at one (1)
+     */
+    'numPages' => [
+        'rules' => ['required', 'integer', 'min:1'],
+    ],
+
+    /**
+     * NUMWORDS validation
+     * - This parameter is required and should be an integer, starting at one (1)
+     */
+    'numWords' => [
+        'rules' => ['required', 'integer', 'min:1'],
+    ],
+
+    /**
+     * COVERFILE validation
+     * - This parameter only allows for files whose MIME type is JPG, GIF, and PNG
+     */
+    'coverFile' => [
+        'rules' => ['mimes:jpg,gif,png'],
+    ],
+
+    /**
+     * STAGE validation
+     * - This parameter is required and allows only for todo, doing, and done as values
+     */
+    'stage' => [
+        'rules' => ['required', 'in:todo,doing,done']
+    ],
 ];
