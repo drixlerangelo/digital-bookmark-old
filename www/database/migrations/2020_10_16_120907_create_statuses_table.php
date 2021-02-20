@@ -16,6 +16,7 @@ class CreateStatusesTable extends Migration
         Schema::create('statuses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('book_id');
+            $table->foreignId('user_id');
             $table->enum('status', ['todo', 'doing', 'done']);
         });
     }

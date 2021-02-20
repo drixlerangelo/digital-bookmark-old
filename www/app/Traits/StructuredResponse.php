@@ -20,7 +20,7 @@ trait StructuredResponse
     /**
      * Response data
      *
-     * @var array
+     * @var mixed
      */
     protected $responseData = [];
 
@@ -60,6 +60,20 @@ trait StructuredResponse
     protected $onlyJson = false;
 
     /**
+     * Tells if the response should be constructed differently
+     *
+     * @var bool
+     */
+    protected $customResponse = false;
+
+    /**
+     * Response headers
+     *
+     * @var array
+     */
+    protected $responseHeaders = [];
+
+    /**
      * Creates the response
      *
      * @param string $redirect
@@ -68,6 +82,11 @@ trait StructuredResponse
      */
     protected function makeResponse($redirect = '')
     {
+        if ($this->customResponse === true) {
+            return response($this->responseData, $this->responseCode)
+                ->withHeaders($this->responseHeaders);
+        }
+
         if (is_string($redirect) && strlen($redirect) > 0) {
             return redirect()->route($redirect);
         }
