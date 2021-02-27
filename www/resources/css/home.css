@@ -72,15 +72,6 @@
     background-color: #BF1B28;
 }
 
-.book-cover {
-    min-width: 4em;
-    height: auto;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
 .book-count, .book-time {
     font-size: 9px;
     color: #BF1B28;
@@ -95,6 +86,13 @@
 .stage-title {
     font-size: 1.3em;
     line-height: 1px;
+}
+
+/* small mobile: up to 320px */
+@media screen and (max-width: 320px) {
+    .modal-holder {
+        width: 18em;
+    }
 }
 
 /* mobile: up to 768px */
@@ -232,7 +230,7 @@
     }
 
     .book-info {
-        width: 65%;
+        width: 62%;
     }
 }
 
@@ -257,5 +255,9 @@
 
     .book-list {
         height: 86%;
+    }
+
+    .modal-holder {
+        margin-top: 25em;
     }
 }

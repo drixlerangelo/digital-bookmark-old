@@ -33,6 +33,12 @@
         </div>
 
         <notification ref="notifDialog"></notification>
+        <register-book-modal
+            v-if="newBookModal.active"
+            :stage="newBookModal.stage"
+            @modal-close="closeBookRegistrationModal"
+            @book-created="addNewBook"
+        ></register-book-modal>
     </div>
 </template>
 
@@ -40,6 +46,7 @@
     import Navbar from '../homepage/Navbar.vue'
     import NotificationDialog from '../homepage/NotificationDialog';
     import BooksHolder from '../homepage/BooksHolder';
+    import RegisterBookModal from '../homepage/RegisterBookModal';
 
     export default {
         name: "HomePage",
@@ -49,9 +56,10 @@
         },
 
         components: {
-            'navbar'       : Navbar,
-            'notification' : NotificationDialog,
-            'books-holder' : BooksHolder
+            'navbar'              : Navbar,
+            'notification'        : NotificationDialog,
+            'books-holder'        : BooksHolder,
+            'register-book-modal' : RegisterBookModal
         },
 
         methods : {
@@ -147,14 +155,33 @@
              * @param {String} stage
              */
             prepareBookRegistration(stage) {
-                // TODO: Show modal for book registration
+                this.newBookModal.stage = stage;
+                this.newBookModal.active = true;
+            },
+
+            /**
+             * Closes the book registration modal
+             */
+            closeBookRegistrationModal() {
+                this.newBookModal.active = false;
+            },
+
+            /**
+             * Process the newly created book
+             *
+             * @param {Object} book
+             */
+            addNewBook(book) {
+                this.entries[book.status].push(book);
+                this.closeBookRegistrationModal();
             }
         },
 
         data() {
             return {
                 initPos : { todo : 0, doing : 0, done : 0 },
-                entries : { todo : [], doing : [], done : [] }
+                entries : { todo : [], doing : [], done : [] },
+                newBookModal : { stage : '', active : false }
             };
         },
 
