@@ -9,9 +9,21 @@
             @paste="validate"
             @change="validate"
             @blur="validate"
+            @mouseover="showCalloutMessage"
+            @mouseleave="showCalloutMessage"
             ref="input"
             :title="tooltip"
-        ><div v-if="validationPassed === false" class="input-error">{{ errorMessage }}</div>
+        >
+        <div
+            v-if="validationPassed === false && useCallout === false"
+            class="input-error"
+            :style="{ 'font-size' : errorFontSize + 'px' }"
+        >{{ errorMessage }}</div>
+        <div
+            class="error-callout"
+            :style="{ 'font-size' : errorFontSize + 'px' }"
+            ref="errorCallout"
+        >{{ errorMessage }}</div>
     </div>
 </template>
 
@@ -27,7 +39,11 @@
             validationStep : { type : Function, default() { return true; } },
             loading        : { type : Boolean },
             rounded        : { type : Boolean },
-            disabled       : { type : Boolean }
+            disabled       : { type : Boolean },
+            small          : { type : Boolean },
+            useCallout     : { type : Boolean },
+            isIntegerOnly  : { type : Boolean },
+            errorFontSize  : { type : Number }
         },
 
         data() {
@@ -42,11 +58,26 @@
         methods : {
             /**
              * Gets the value the user entered to be validated
-             *
-             * @param {Object}
              */
-            validate({ target }) {
-                this.validationPassed = this.validationStep(target.value);
+            validate() {
+                if (this.isIntegerOnly) {
+                    this.$refs.input.value = this.$refs.input.value.replace(/[^0-9]/, '');
+                }
+
+                this.validationPassed = this.validationStep(this.$refs.input.value);
+            },
+
+            /**
+             * Show the callout message when hovered
+             */
+            showCalloutMessage({ type }) {
+                if (this.useCallout === true && this.validationPassed === false) {
+                    if (type === 'mouseover') {
+                        this.$refs.errorCallout.style.display = 'flex';
+                    } else {
+                        this.$refs.errorCallout.style.display = 'none';
+                    }
+                }
             }
         },
 
@@ -57,12 +88,18 @@
             validationPassed() {
                 this.$refs.input.classList.toggle('is-danger', this.validationPassed === false);
 
-                if (this.validationPassed === true) {
-                    this.$refs.input.style.marginBottom = '3vh';
-                    this.$refs.input.style.borderColor = '#DBDBDB';
+                if (this.useCallout === false) {
+                    if (this.validationPassed === true) {
+                        this.$refs.input.style.marginBottom = '3vh';
+                        this.$refs.input.style.borderColor = '#DBDBDB';
+                    } else {
+                        this.$refs.input.style.marginBottom = '0vh';
+                        this.$refs.input.style.borderColor = '#BF2C1F';
+                    }
                 } else {
-                    this.$refs.input.style.marginBottom = '0vh';
-                    this.$refs.input.style.borderColor = '#BF2C1F';
+                    if (this.validationPassed === true) {
+                        this.$refs.errorCallout.style.display = 'none';
+                    }
                 }
             },
 
@@ -73,6 +110,15 @@
                 (this.loading === true)
                     ? this.controlClasses.push('is-loading')
                     : this.controlClasses.splice(this.controlClasses.indexOf('is-loading'), 1);
+            },
+
+            /**
+             * Automatically make the validation fail when an error is found
+             */
+            errorMessage() {
+                if (this.errorMessage.length > 0) {
+                    this.validationPassed = false;
+                }
             }
         },
 
@@ -80,9 +126,13 @@
             const allowedTypes = ['text', 'password', 'number'];
             this.typeData = (allowedTypes.indexOf(this.type) === -1) ? 'text' : this.type;
 
-            (this.rounded === true)
-                ? this.inputClasses.push('is-rounded')
-                : this.inputClasses.splice(this.inputClasses.indexOf('is-rounded'), 1);
+            if (this.rounded === true) {
+                this.inputClasses.push('is-rounded');
+            }
+
+            if (this.small === true) {
+                this.inputClasses.push('is-small');
+            }
         }
     }
 </script>
@@ -93,5 +143,27 @@
         margin-right: auto;
         margin-bottom: 3vh;
         color: #BF2C1F;
+    }
+
+    .error-callout {
+        z-index: 40;
+        position: absolute;
+        background-color: #BF1B28;
+        border-radius: 5px;
+        padding: 2px 10px;
+        margin-top: 4px;
+        display: none;
+        color: white;
+        opacity: 90%;
+        white-space: nowrap;
+    }
+
+    .error-callout:after {
+        content: "";
+        position: absolute;
+        left: 8px;
+        top: -20px;
+        border: 10px solid transparent;
+        border-bottom: 10px solid #BF1B28;
     }
 </style>
