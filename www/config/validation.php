@@ -86,4 +86,38 @@ return [
     'stage' => [
         'rules' => ['required', 'in:todo,doing,done']
     ],
+
+    /**
+     * PAGESTOREAD validation
+     * - This parameter is required and should be an integer, starting at one (1)
+     */
+    'pagesToRead' => [
+        'rules' => ['required', 'integer', 'min:1']
+    ],
+
+    /**
+     * TIMEFROM validation
+     * - This parameter is required. It follows the format H:i, where "H" is the two-digit
+     * representation for 0-24 hours and "i" for 0-59 minutes. It is different from the end time.
+     */
+    'timeFrom' => [
+        'rules' => ['required', 'date_format:H:i', 'different:timeTo']
+    ],
+
+    /**
+     * TIMETO validation
+     * - This parameter is required. It follows the format H:i, where "H" is the two-digit
+     * representation for 0-24 hours and "i" for 0-59 minutes. It is different from the start time.
+     */
+    'timeTo' => [
+        'rules' => ['required', 'date_format:H:i', 'different:timeFrom']
+    ],
+
+    /**
+     * DAYS validation
+     * - This parameter is required and allows only for sun, mon, tue, wed, thu, fri, and sat as values
+     */
+    'days' => [
+        'rules' => ['required', 'array', 'in:sun,mon,tue,wed,thu,fri,sat']
+    ],
 ];

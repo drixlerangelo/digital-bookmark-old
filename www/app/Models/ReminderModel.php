@@ -16,13 +16,6 @@ class ReminderModel extends Model
     use HasFactory;
 
     /**
-     * Determines if they are columns relating to creation and modification datetime
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * Override table name
      *
      * @var string
