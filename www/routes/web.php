@@ -46,4 +46,8 @@ Route::middleware('auth')->group(function () {
         Route::post('register', [BookController::class, 'registerBook'])->name('book.create');
         Route::get('{image}', [BookController::class, 'displayCover'])->name('book.display');
     });
+
+    Route::prefix('reminder')->group(function () {
+        Route::post('register', [ReminderController::class, 'registerReminder'])->name('reminder.create');
+    });
 });
