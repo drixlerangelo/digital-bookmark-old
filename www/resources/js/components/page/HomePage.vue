@@ -2,6 +2,8 @@
     <div>
         <navbar :username="username" @reminder-checked="showGoalReminder"></navbar>
 
+        <goal-display></goal-display>
+
         <div class="slider">
             <div class="slides" ref="slides">
                 <books-holder
@@ -33,12 +35,15 @@
         </div>
 
         <notification ref="notifDialog"></notification>
+
         <register-book-modal
             v-if="newBookModal.active"
             :stage="newBookModal.stage"
             @modal-close="closeBookRegistrationModal"
             @book-created="addNewBook"
         ></register-book-modal>
+
+        <set-goal-modal></set-goal-modal>
     </div>
 </template>
 
@@ -47,6 +52,8 @@
     import NotificationDialog from '../homepage/NotificationDialog';
     import BooksHolder from '../homepage/BooksHolder';
     import RegisterBookModal from '../homepage/RegisterBookModal';
+    import SetGoalModal from '../homepage/SetGoalModal';
+    import GoalDisplay from '../homepage/GoalDisplay';
 
     export default {
         name: "HomePage",
@@ -59,7 +66,9 @@
             'navbar'              : Navbar,
             'notification'        : NotificationDialog,
             'books-holder'        : BooksHolder,
-            'register-book-modal' : RegisterBookModal
+            'register-book-modal' : RegisterBookModal,
+            'set-goal-modal'      : SetGoalModal,
+            'goal-display'        : GoalDisplay
         },
 
         methods : {
