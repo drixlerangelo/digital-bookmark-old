@@ -88,6 +88,10 @@
     line-height: 1px;
 }
 
+.even-spacing {
+    margin-top: 3em;
+}
+
 /* small mobile: up to 320px */
 @media screen and (max-width: 320px) {
     .modal-holder {
@@ -130,6 +134,10 @@
 
     .book-list {
         height: 74%;
+    }
+
+    .even-spacing {
+        width: 90%;
     }
 }
 

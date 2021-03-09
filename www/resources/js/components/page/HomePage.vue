@@ -4,7 +4,7 @@
 
         <goal-display></goal-display>
 
-        <div class="slider">
+        <div class="slider even-spacing">
             <div class="slides" ref="slides">
                 <books-holder
                     :entries="entries.todo"
