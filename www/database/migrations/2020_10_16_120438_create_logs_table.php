@@ -19,6 +19,7 @@ class CreateLogsTable extends Migration
             $table->integer('pages_read');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
+            $table->timestamps();
         });
     }
 

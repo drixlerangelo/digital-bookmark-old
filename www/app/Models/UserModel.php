@@ -47,4 +47,12 @@ class UserModel extends Authenticatable
     {
         return $this->hasMany(ReminderModel::class, 'user_id');
     }
+
+    /**
+     * Creates the relationship between the user and logs
+     */
+    public function linkStatus()
+    {
+        return $this->hasMany(StatusModel::class, 'user_id');
+    }
 }

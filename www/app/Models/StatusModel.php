@@ -36,4 +36,12 @@ class StatusModel extends Model
     {
         // TODO: add the relationship between status and logs
     }
+
+    /**
+     * Creates the relationship between the status and logs
+     */
+    public function linkBook()
+    {
+        return $this->belongsTo(BookModel::class, 'book_id');
+    }
 }
