@@ -22,11 +22,11 @@
                     </a>
 
                     <div class="navbar-dropdown is-right">
-                        <a class="navbar-item" ref="goalSetup">
-                            Set the goal
+                        <a class="navbar-item coming-soon" ref="goalSetup" @click="showGoalModal">
+                            Edit the goal
                         </a>
                         <hr class="navbar-divider">
-                        <a class="navbar-item">
+                        <a class="navbar-item coming-soon">
                             Settings
                         </a>
                         <hr class="navbar-divider">
@@ -64,10 +64,17 @@
                 axios.get('/reminder/check')
                 .then(function ({ data }) {
                     const payload = data.data;
-
                     this.hasReminder = payload.hasReminder;
+
+                    if (this.hasReminder) {
+                        this.changeGoalMenuMessage();
+                    } else {
+                        this.$refs.goalSetup.classList.toggle('coming-soon', false);
+                        this.$refs.goalSetup.innerText = 'Set the goal';
+                    }
+
                     this.changeTarget();
-                    this.$emit('reminder-checked', this.hasReminder);
+                    this.$emit('reminder-checked', payload);
                 }.bind(this))
                 .catch(function ({ response }) {
                     this.$emit('error-found', response.data);
@@ -87,12 +94,30 @@
                 this.$refs.navbarBurger.classList.remove('navbar-reminder');
 
                 this.$refs[displayTarget].classList.toggle('navbar-reminder', this.hasReminder === false);
+            },
+
+            /**
+             * Trigger to start creating a goal
+             */
+            showGoalModal() {
+                if (this.hasReminder === false) {
+                    this.$emit('set-goal');
+                }
+            },
+
+            /**
+             * Change the menu message if there is already a goal
+             */
+            changeGoalMenuMessage() {
+                this.hasReminder = true;
+                this.$refs.goalSetup.classList.toggle('coming-soon', true);
+                this.changeTarget();
             }
         },
 
         data() {
             return {
-                hasReminder : true
+                hasReminder : false
             };
         },
 

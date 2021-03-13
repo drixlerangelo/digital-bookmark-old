@@ -43,6 +43,14 @@ class ReminderController extends Controller
     {
         $this->onlyJson = true;
         $this->responseData['hasReminder'] = $this->findActiveGoal();
+        $this->responseData['reminder'] = $this->reminderModel
+            ->select(['pages_to_read', 'time_frame', 'days'])
+            ->where('delete_status', false)
+            ->where('user_id', \Auth::id())
+            ->first();
+        $this->responseData['reminder'] = (is_null($this->responseData['reminder']))
+            ? []
+            : $this->responseData['reminder']->toArray();
 
         return $this->makeResponse();
     }
@@ -69,7 +77,7 @@ class ReminderController extends Controller
         $validDays = array_filter($validDays, function ($day) use ($validatedInputs) { return in_array($day, $validatedInputs['days']); });
         $validatedInputs['days'] = implode(',', $validDays);
 
-        $this->reminderModel->user_id = \Auth::id();
+        $this->reminderModel->user_id = (int) \Auth::id();
         $this->reminderModel->pages_to_read = $validatedInputs['pagesToRead'];
         $this->reminderModel->time_frame = sprintf('%s-%s', $validatedInputs['timeFrom'], $validatedInputs['timeTo']);
         $this->reminderModel->days = $validatedInputs['days'];

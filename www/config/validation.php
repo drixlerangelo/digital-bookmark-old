@@ -101,7 +101,7 @@ return [
      * representation for 0-24 hours and "i" for 0-59 minutes. It is different from the end time.
      */
     'timeFrom' => [
-        'rules' => ['required', 'date_format:H:i', 'different:timeTo']
+        'rules' => ['required', 'date_format:H:i', 'before:timeTo']
     ],
 
     /**
@@ -110,7 +110,7 @@ return [
      * representation for 0-24 hours and "i" for 0-59 minutes. It is different from the start time.
      */
     'timeTo' => [
-        'rules' => ['required', 'date_format:H:i', 'different:timeFrom']
+        'rules' => ['required', 'date_format:H:i', 'after:timeFrom']
     ],
 
     /**

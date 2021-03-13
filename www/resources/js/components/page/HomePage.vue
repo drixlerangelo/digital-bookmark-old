@@ -1,8 +1,12 @@
 <template>
     <div>
-        <navbar :username="username" @reminder-checked="showGoalReminder"></navbar>
+        <navbar :username="username" @reminder-checked="showGoalReminder" @set-goal="prepareGoalCreation" ref="navbar"></navbar>
 
-        <div class="slider">
+        <goal-display
+            :reminder="reminder"
+        ></goal-display>
+
+        <div class="slider even-spacing">
             <div class="slides" ref="slides">
                 <books-holder
                     :entries="entries.todo"
@@ -33,12 +37,19 @@
         </div>
 
         <notification ref="notifDialog"></notification>
+
         <register-book-modal
             v-if="newBookModal.active"
             :stage="newBookModal.stage"
             @modal-close="closeBookRegistrationModal"
             @book-created="addNewBook"
         ></register-book-modal>
+
+        <set-goal-modal
+            v-if="goalModalActive"
+            @modal-close="finishGoalCreation"
+            @goal-created="setupGoalView"
+        ></set-goal-modal>
     </div>
 </template>
 
@@ -47,6 +58,8 @@
     import NotificationDialog from '../homepage/NotificationDialog';
     import BooksHolder from '../homepage/BooksHolder';
     import RegisterBookModal from '../homepage/RegisterBookModal';
+    import SetGoalModal from '../homepage/SetGoalModal';
+    import GoalDisplay from '../homepage/GoalDisplay';
 
     export default {
         name: "HomePage",
@@ -59,7 +72,9 @@
             'navbar'              : Navbar,
             'notification'        : NotificationDialog,
             'books-holder'        : BooksHolder,
-            'register-book-modal' : RegisterBookModal
+            'register-book-modal' : RegisterBookModal,
+            'set-goal-modal'      : SetGoalModal,
+            'goal-display'        : GoalDisplay
         },
 
         methods : {
@@ -122,8 +137,12 @@
 
             /**
              * Shows a notification if no goal was set
+             *
+             * @param {Object}
              */
-            showGoalReminder(hasReminder) {
+            showGoalReminder({ hasReminder, reminder }) {
+                this.reminder = reminder;
+
                 if (hasReminder === false) {
                     this.$refs.notifDialog.openNotif('No goal set', 'You have not yet set a goal.');
                 }
@@ -174,6 +193,31 @@
             addNewBook(book) {
                 this.entries[book.status].push(book);
                 this.closeBookRegistrationModal();
+            },
+
+            /**
+             * Show a modal for reminder registration
+             */
+            prepareGoalCreation() {
+                this.goalModalActive = true;
+            },
+
+            /**
+             * Finishes reminder registration
+             */
+            finishGoalCreation() {
+                this.goalModalActive = false;
+            },
+
+            /**
+             * Process the newly created reminder
+             *
+             * @param {Object} reminder
+             */
+            setupGoalView(reminder) {
+                this.goalModalActive = false;
+                this.reminder = reminder;
+                this.$refs.navbar.changeGoalMenuMessage();
             }
         },
 
@@ -181,7 +225,9 @@
             return {
                 initPos : { todo : 0, doing : 0, done : 0 },
                 entries : { todo : [], doing : [], done : [] },
-                newBookModal : { stage : '', active : false }
+                newBookModal : { stage : '', active : false },
+                goalModalActive : false,
+                reminder : {}
             };
         },
 

@@ -146,10 +146,12 @@
              */
             emulateInputFile(event) {
                 if (event.type === 'click') {
-                    // Create the input file
-                    this.inputFile = document.createElement('input');
-                    this.inputFile.type = 'file';
-                    this.$refs.bookPreview.appendChild(this.inputFile);
+                    // Create a new one if there's no unused element
+                    if (typeof this.inputFile === 'undefined') {
+                        this.inputFile = document.createElement('input');
+                        this.inputFile.type = 'file';
+                        this.$refs.bookPreview.appendChild(this.inputFile);
+                    }
 
                     // Add a listener when a file is chosen
                     this.inputFile.addEventListener('change', this.emulateInputFile);
