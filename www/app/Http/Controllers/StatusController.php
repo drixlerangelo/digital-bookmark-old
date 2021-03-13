@@ -53,7 +53,7 @@ class StatusController extends Controller
         $params['mode'] = (array_key_exists('mode', $params)) ? $params['mode'] : 'all';
 
         $statuses = ($params['mode'] === 'all') ? ['todo', 'doing', 'done'] : [$params['mode']];
-        $columns = ['status', 'name', 'author', 'num_pages', 'num_words', 'cover_photo_path'];
+        $columns = ['statuses.id AS status_id', 'status', 'name', 'author', 'num_pages', 'num_words', 'cover_photo_path'];
 
         $this->responseData['entries'] = $this->statusModel
             ->where('statuses.user_id', '=', Auth::id())

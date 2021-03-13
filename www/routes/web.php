@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,5 +50,9 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('reminder')->group(function () {
         Route::post('register', [ReminderController::class, 'registerReminder'])->name('reminder.create');
+    });
+
+    Route::prefix('log')->group(function () {
+        Route::post('register', [LogController::class, 'registerLog'])->name('log.create');
     });
 });

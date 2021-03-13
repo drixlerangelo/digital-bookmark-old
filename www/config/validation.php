@@ -120,4 +120,37 @@ return [
     'days' => [
         'rules' => ['required', 'array', 'in:sun,mon,tue,wed,thu,fri,sat']
     ],
+
+    /**
+     * STATUSID validation
+     * - This parameter is required, should be an integer that starts at one (1),
+     * and must also exist in the statuses database
+     */
+    'statusId' => [
+        'rules' => ['required', 'integer', 'min:1', 'exists:statuses,id']
+    ],
+
+    /**
+     * PAGESREAD validation
+     * - This parameter is required and should be an integer, starting at one (1)
+     */
+    'pagesRead' => [
+        'rules' => ['required', 'integer', 'min:1']
+    ],
+
+    /**
+     * DATETIMEFROM validation
+     * - This parameter is required. It follows the format "Y-m-d H:i". It is different from the end datetime.
+     */
+    'datetimeFrom' => [
+        'rules' => ['required', 'date_format:Y-m-d H:i', 'before:datetimeTo', 'before:now']
+    ],
+
+    /**
+     * DATETIMETO validation
+     * - This parameter is required. It follows the format "Y-m-d H:i". It is different from the start datetime.
+     */
+    'datetimeTo' => [
+        'rules' => ['required', 'date_format:Y-m-d H:i', 'after:datetimeFrom', 'before:now']
+    ]
 ];
