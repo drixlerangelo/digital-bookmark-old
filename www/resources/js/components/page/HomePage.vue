@@ -1,8 +1,10 @@
 <template>
     <div>
-        <navbar :username="username" @reminder-checked="showGoalReminder"></navbar>
+        <navbar :username="username" @reminder-checked="showGoalReminder" @set-goal="prepareGoalCreation" ref="navbar"></navbar>
 
-        <goal-display></goal-display>
+        <goal-display
+            :reminder="reminder"
+        ></goal-display>
 
         <div class="slider even-spacing">
             <div class="slides" ref="slides">
@@ -43,7 +45,11 @@
             @book-created="addNewBook"
         ></register-book-modal>
 
-        <set-goal-modal></set-goal-modal>
+        <set-goal-modal
+            v-if="goalModalActive"
+            @modal-close="finishGoalCreation"
+            @goal-created="setupGoalView"
+        ></set-goal-modal>
     </div>
 </template>
 
@@ -131,8 +137,12 @@
 
             /**
              * Shows a notification if no goal was set
+             *
+             * @param {Object}
              */
-            showGoalReminder(hasReminder) {
+            showGoalReminder({ hasReminder, reminder }) {
+                this.reminder = reminder;
+
                 if (hasReminder === false) {
                     this.$refs.notifDialog.openNotif('No goal set', 'You have not yet set a goal.');
                 }
@@ -183,6 +193,31 @@
             addNewBook(book) {
                 this.entries[book.status].push(book);
                 this.closeBookRegistrationModal();
+            },
+
+            /**
+             * Show a modal for reminder registration
+             */
+            prepareGoalCreation() {
+                this.goalModalActive = true;
+            },
+
+            /**
+             * Finishes reminder registration
+             */
+            finishGoalCreation() {
+                this.goalModalActive = false;
+            },
+
+            /**
+             * Process the newly created reminder
+             *
+             * @param {Object} reminder
+             */
+            setupGoalView(reminder) {
+                this.goalModalActive = false;
+                this.reminder = reminder;
+                this.$refs.navbar.changeGoalMenuMessage();
             }
         },
 
@@ -190,7 +225,9 @@
             return {
                 initPos : { todo : 0, doing : 0, done : 0 },
                 entries : { todo : [], doing : [], done : [] },
-                newBookModal : { stage : '', active : false }
+                newBookModal : { stage : '', active : false },
+                goalModalActive : false,
+                reminder : {}
             };
         },
 

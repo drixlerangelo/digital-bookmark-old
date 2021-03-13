@@ -123,7 +123,7 @@
         },
 
         created() {
-            const allowedTypes = ['text', 'password', 'number'];
+            const allowedTypes = ['text', 'password', 'number', 'time'];
             this.typeData = (allowedTypes.indexOf(this.type) === -1) ? 'text' : this.type;
 
             if (this.rounded === true) {
