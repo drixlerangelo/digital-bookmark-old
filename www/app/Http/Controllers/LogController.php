@@ -73,9 +73,11 @@ class LogController extends Controller
             $this->responseMsg = 'Successfully added your log.';
             $this->responseData['wasPassed'] = true;
             $this->responseData['log'] = [
+                'id'         => $this->logModel->id,
+                'status_id'  => $this->logModel->status_id,
                 'pages_read' => $this->logModel->pages_read,
-                'start_time' => $this->logModel->start_time,
-                'end_time'   => $this->logModel->end_time
+                'start_time' => strtotime($this->logModel->start_time),
+                'end_time'   => strtotime($this->logModel->end_time)
             ];
 
             return $this->makeResponse();
@@ -98,9 +100,12 @@ class LogController extends Controller
      */
     private function validateLog()
     {
-        $this->selectedParams = ['statusId', 'pagesRead', 'datetimeFrom', 'datetimeTo'];
+        $this->selectedParams = ['statusId', 'pagesRead', 'datetimeFrom', 'datetimeTo', 'date', 'timeFrom', 'timeTo'];
         $parameters = $this->prepareInputs();
         $rules = $this->fetchRules();
+
+        $parameters['datetimeFrom'] = $parameters['date'] . ' ' . $parameters['timeFrom'];
+        $parameters['datetimeTo'] = $parameters['date'] . ' ' . $parameters['timeTo'];
 
         return $this->conductTest($parameters, $rules);
     }
@@ -174,11 +179,17 @@ class LogController extends Controller
             'You have an overlap to both of your time.',
         ];
 
+        $errorData = [
+            ['datetimeFrom' => $errorMessages[0]],
+            ['datetimeTo' => $errorMessages[1]],
+            ['datetimeFrom' => $errorMessages[0], 'datetimeTo' => $errorMessages[1]]
+        ];
+
         $checkResult = array_filter($conditions);
 
         if ($this->logStatusFailed = count($checkResult) > 0) {
             $messageIndex = array_keys($checkResult)[0];
-            $this->setErrorStatus($errorMessages[$messageIndex]);
+            $this->setErrorStatus($errorMessages[$messageIndex], $errorData[$messageIndex]);
         }
     }
 

@@ -12,7 +12,7 @@
             </template>
         </div>
         <div class="stage-bottom">
-            <button v-if="stage !== 'done'" class="button show-book-form-button is-fullwidth" @click="showBookForm">
+            <button v-if="stage !== 'done'" :class="['button', 'show-book-form-button', 'is-fullwidth', stage + '-add-book']" @click="showBookForm">
                 + Add New Book
             </button>
         </div>
@@ -38,7 +38,10 @@
              * Trigger for showing the book registration form
              */
             showBookForm() {
-                this.$emit('prompt-book-registration', this.stage);
+                if (this.stage === 'doing') { // TODO: Remove if changing status is available
+                    this.$emit('prompt-book-registration', this.stage);
+                }
+
             }
         }
     }

@@ -70,7 +70,7 @@
         width: 20em;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 9em;
+        margin-top: 7em;
         z-index: 32;
     }
 

@@ -34,7 +34,7 @@ class StatusModel extends Model
      */
     public function linkLog()
     {
-        // TODO: add the relationship between status and logs
+        return $this->hasMany(LogModel::class, 'status_id');
     }
 
     /**

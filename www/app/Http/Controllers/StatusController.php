@@ -55,19 +55,42 @@ class StatusController extends Controller
         $statuses = ($params['mode'] === 'all') ? ['todo', 'doing', 'done'] : [$params['mode']];
         $columns = ['statuses.id AS status_id', 'status', 'name', 'author', 'num_pages', 'num_words', 'cover_photo_path'];
 
-        $this->responseData['entries'] = $this->statusModel
-            ->where('statuses.user_id', '=', Auth::id())
-            ->whereIn('status', $statuses)
-            ->join('books', 'books.id', '=', 'statuses.book_id')
-            ->select($columns)
-            ->get()
-            ->toArray();
+        $this->responseData['entries'] = array_map(
+            [$this, 'fetchLogs'],
+            $this->statusModel
+                ->where('statuses.user_id', '=', Auth::id())
+                ->whereIn('status', $statuses)
+                ->join('books', 'books.id', '=', 'statuses.book_id')
+                ->select($columns)
+                ->get()
+                ->toArray()
+        );
 
         return $this->makeResponse();
     }
 
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
+
+    /**
+     * Fetches the related logs of the statuses
+     *
+     * @param array $entry
+     *
+     * @return array $entry
+     */
+    private function fetchLogs($entry)
+    {
+        if ($entry['status'] === 'doing') {
+            $entry['logs'] = $this->statusModel
+                ->where('id', $entry['status_id'])
+                ->first()
+                ->linkLog
+                ->toArray();
+        }
+
+        return $entry;
+    }
 
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
 }

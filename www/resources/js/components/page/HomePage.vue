@@ -50,6 +50,12 @@
             @modal-close="finishGoalCreation"
             @goal-created="setupGoalView"
         ></set-goal-modal>
+
+        <log-book-modal
+            v-if="newLogModal.active"
+            :book="newLogModal.book"
+            @modal-close="finishBookLog"
+        ></log-book-modal>
     </div>
 </template>
 
@@ -60,6 +66,7 @@
     import RegisterBookModal from '../homepage/RegisterBookModal';
     import SetGoalModal from '../homepage/SetGoalModal';
     import GoalDisplay from '../homepage/GoalDisplay';
+    import LogBookModal from '../homepage/LogBookModal';
 
     export default {
         name: "HomePage",
@@ -74,7 +81,8 @@
             'books-holder'        : BooksHolder,
             'register-book-modal' : RegisterBookModal,
             'set-goal-modal'      : SetGoalModal,
-            'goal-display'        : GoalDisplay
+            'goal-display'        : GoalDisplay,
+            'log-book-modal'      : LogBookModal
         },
 
         methods : {
@@ -158,7 +166,7 @@
                     if (entries.length > 0) {
                         for (let index = 0; index < entries.length; index ++) {
                             let entry = entries[index];
-                            entry.logs = []; // Add this for the meantime while there's no log functionality
+                            this.convertLogsData(entry);
 
                             this.entries[entry.status].push(entry);
                         }
@@ -218,6 +226,33 @@
                 this.goalModalActive = false;
                 this.reminder = reminder;
                 this.$refs.navbar.changeGoalMenuMessage();
+            },
+
+            /**
+             * Closes and resets the log creation modal
+             */
+            finishBookLog() {
+                this.newLogModal.active = false;
+                this.newLogModal.book = {};
+            },
+
+            /**
+             * Convert the log data received from the server
+             *
+             * @param {Object} entry
+             */
+            convertLogsData(entry) {
+                if (entry.status === 'doing') {
+                    for (let log of entry.logs) {
+                        // Make it an integer to avoid repetitive data type conversion
+                        log.status_id = parseInt(log.status_id);
+                        log.pages_read = parseInt(log.pages_read);
+
+                        // Convert to a timestamp for ease in the calculation
+                        log.start_time = new Date(log.start_time).getTime() / 1000;
+                        log.end_time = new Date(log.end_time).getTime() / 1000;
+                    }
+                }
             }
         },
 
@@ -227,7 +262,8 @@
                 entries : { todo : [], doing : [], done : [] },
                 newBookModal : { stage : '', active : false },
                 goalModalActive : false,
-                reminder : {}
+                reminder : {},
+                newLogModal : {active : false, book : {}}
             };
         },
 
@@ -242,6 +278,24 @@
             }.bind(this));
 
             this.loadEntries();
+        },
+
+        created() {
+            window.eventBus.$on('start-log', function (book) {
+                this.newLogModal.active = true;
+                this.newLogModal.book = book;
+            }.bind(this));
+
+            window.eventBus.$on('log-created', function (log) {
+                for (let index = 0; index < this.entries.doing.length; index++) {
+                    let book = this.entries.doing[index];
+
+                    if (parseInt(book.status_id) === parseInt(log.status_id)) {
+                        book.logs.push(log);
+                    }
+                }
+                this.finishBookLog();
+            }.bind(this));
         }
     }
 </script>

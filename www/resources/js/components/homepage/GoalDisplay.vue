@@ -1,6 +1,6 @@
 <template>
     <div class="even-spacing">
-        <progress class="progress is-small is-danger goal-meter" :value="goalProgress" max="100"></progress>
+        <progress class="progress is-small is-danger goal-meter" :title="goalTooltip" :value="goalProgress" max="100"></progress>
         <div class="goal-message">{{ currentMessage }}</div>
     </div>
 </template>
@@ -52,23 +52,27 @@
         name: "GoalDisplay",
 
         props : {
-            reminder : { type : Object|Array, default : function () { return {}; } },
-            logs     : { type : Array, default : function () { return []; } }
+            reminder : { type : Object|Array, default : function () { return {}; } }
         },
 
         data() {
             return {
-                days : ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-                goalProgress   : 0,
+                days : {sun : 0, mon : 1, tue : 2, wed : 3, thu : 4, fri : 5, sat : 6},
+                goalProgress : 0,
                 currentMessage : '',
-                messages       : [
-                    'You have no goals yet. Better get started!',
+                messages : [
+                    'Better get started!',
                     '%s day/s to go this week!',
                     'You overdid yourself today!',
-                    'Good going, %s pages left for today!',
-                    'You achieve your daily goal, good work!',
+                    'Good going, %s pages to go!',
+                    'Daily goal achieved, nice work!',
                     'You have no daily goal for today!'
-                ]
+                ],
+                logs : [],
+                daysPagesRead : {},
+                reminderDays : [],
+                reminderTimestamps : [],
+                goalTooltip : ''
             };
         },
 
@@ -78,27 +82,141 @@
              */
             checkForReminders() {
                 let hasReminder = Object.keys(this.reminder).length > 0;
-                let noLogs = this.logs.length === 0;
 
                 if (hasReminder) {
-                    if (noLogs) {
-                        let dayToday = (new Date).getDay();
-                        let daysLeft = this.reminder.days.split(',').filter(function (day) {
-                            return this.days.indexOf(day) >= dayToday;
-                        }.bind(this)).length;
+                    this.reminderDays = this.reminder.days.split(',');
 
-                        this.currentMessage = this.messages[MSG_AFTER_LOGIN].replace('%s', daysLeft);
-                    } else {
-                        // TODO: calculate progress from logs
-                    }
+                    this.findReminderDates();
+                    this.processCurrentWeekLogs();
+                    this.calcGoalProgress();
+                    this.calcTodaysProgress();
                 } else {
                     this.currentMessage = this.messages[MSG_NO_GOAL];
+                }
+            },
+
+            /**
+             * Create storage for pages read in the current week
+             */
+            findCurrentWeekRange() {
+                let indexesOFDays = Object.values(this.days);
+
+                for (let day of indexesOFDays) {
+                    let adjustedDate = new Date();
+
+                    adjustedDate.setMilliseconds(0);
+                    adjustedDate.setHours(0, 0, 0);
+                    adjustedDate.setDate(adjustedDate.getDate() - day);
+
+                    this.daysPagesRead[adjustedDate.getTime()] = 0;
+                }
+            },
+
+            /**
+             * Find the dates the user should be reminded of their goal
+             */
+            findReminderDates() {
+                let dayToday = (new Date()).getDay();
+                this.reminderTimestamps = [];
+
+                for (let day of this.reminderDays) {
+                    if (this.days[day] <= dayToday) {
+                        let dayRelPos = dayToday - this.days[day];
+                        let reminderDate = new Date();
+
+                        reminderDate.setDate(reminderDate.getDate() - dayRelPos);
+                        reminderDate.setMilliseconds(0);
+                        reminderDate.setHours(0, 0, 0);
+
+                        let reminderTimestamp = reminderDate.getTime();
+
+                        if (this.reminderTimestamps.indexOf(reminderTimestamp) === -1) {
+                            this.reminderTimestamps.push(reminderTimestamp);
+                        }
+                    }
+                }
+            },
+
+            /**
+             * Sum all the pages read of the current week
+             */
+            processCurrentWeekLogs() {
+                for (let log of this.logs) {
+                    let dtStart = new Date(log.start_time * 1000);
+                    dtStart.setHours(0, 0, 0);
+
+                    let timestamp = dtStart.getTime();
+                    let dayExists = typeof this.daysPagesRead[timestamp] !== 'undefined';
+
+                    if (dayExists) {
+                        this.daysPagesRead[timestamp] += log.pages_read;
+                    }
+                }
+            },
+
+            /**
+             * Compares the pages read this week from the goal's pages to read to find the progress
+             */
+            calcGoalProgress() {
+                let reminderPagesToRead = parseInt(this.reminder.pages_to_read);
+                let totalPagesToRead = this.reminderTimestamps.length * reminderPagesToRead;
+                let daysReadCount = 0;
+                let totalPagesRead = 0;
+
+                for (let timestamp in this.daysPagesRead) {
+                    let pagesRead = this.daysPagesRead[timestamp];
+
+                    totalPagesRead += (reminderPagesToRead < pagesRead)
+                        ? reminderPagesToRead
+                        : pagesRead;
+
+                    daysReadCount += (this.reminderTimestamps.indexOf(timestamp) !== 1 && pagesRead > 0) ? 1 : 0;
+                }
+
+                this.goalProgress = parseInt((totalPagesRead / totalPagesToRead) * 10000) / 100;
+                this.goalTooltip = `You've read in ${daysReadCount} out of ${this.reminderTimestamps.length} days.`;
+                this.goalTooltip += ` That's a progress of around ${this.goalProgress}%.`;
+            },
+
+            /**
+             * Calculate the daily goal if it has been achieved and send out an appropriate message
+             */
+            calcTodaysProgress() {
+                let today = new Date();
+                let reminderPagesToRead = parseInt(this.reminder.pages_to_read);
+
+                today.setMilliseconds(0);
+                today.setHours(0, 0, 0);
+
+                let timestampToday = today.getTime();
+                let todaysRead = this.daysPagesRead[timestampToday];
+
+                if (todaysRead === 0) {
+                    let daysLeft = this.reminderDays.filter(function (day) {
+                        return this.days[day] >= today.getDate();
+                    }.bind(this)).length;
+                    this.currentMessage = this.messages[MSG_AFTER_LOGIN].replace('%s', daysLeft);
+                } else if (todaysRead > reminderPagesToRead) {
+                    this.currentMessage = this.messages[MSG_GOAL_OVERDID];
+                } else if (todaysRead === reminderPagesToRead) {
+                    this.currentMessage = this.messages[MSG_GOAL_ACHIEVED];
+                } else if (this.reminderTimestamps.indexOf(timestampToday) === -1) {
+                    this.currentMessage = this.messages[MSG_GOAL_HOLIDAY];
+                } else {
+                    let remainingPages = reminderPagesToRead - todaysRead;
+                    this.currentMessage = this.messages[MSG_TO_GET_GOAL].replace('%s', remainingPages);
                 }
             }
         },
 
         created() {
             this.checkForReminders();
+            this.findCurrentWeekRange();
+
+            window.eventBus.$on('share-logs', function (logs) {
+                this.logs = logs;
+                this.checkForReminders();
+            }.bind(this));
         },
 
         watch : {
@@ -125,6 +243,7 @@
         text-align: center;
         color: #BF1B28;
         font-family: Roboto;
+        margin-top: 5px;
     }
 
     .goal-meter::-webkit-progress-value {

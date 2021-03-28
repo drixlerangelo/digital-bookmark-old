@@ -48,14 +48,20 @@ export default {
      */
     validateLength(min, max, type = 'string') {
         let value = (type === 'string') ? this.input.length : this.input;
+        let {minValue, maxValue} = (type === 'date') ? [min.toDateString(), max.toDateString()] : [min, max];
+
         const errorMessages = {
             string : {
-                minimum : `A minimum of ${min} character/s is needed.`,
-                maximum : `A maximum of ${max} character/s is needed.`
+                minimum : `A minimum of ${minValue} character/s is needed.`,
+                maximum : `A maximum of ${maxValue} character/s is needed.`
             },
             number : {
-                minimum : `The number must be at least ${min}.`,
-                maximum : `The number must be at most ${max}.`
+                minimum : `The number must be at least ${minValue}.`,
+                maximum : `The number must be at most ${maxValue}.`
+            },
+            date   : {
+                minimum : `The date must be at least ${minValue}.`,
+                maximum : `The date must be at most ${maxValue}.`
             }
         };
 

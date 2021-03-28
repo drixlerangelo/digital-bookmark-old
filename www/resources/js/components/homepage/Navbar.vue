@@ -112,6 +112,7 @@
                 this.hasReminder = true;
                 this.$refs.goalSetup.classList.toggle('coming-soon', true);
                 this.changeTarget();
+                this.$refs.goalSetup.innerText = 'Edit the goal';
             }
         },
 
