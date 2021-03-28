@@ -43,7 +43,6 @@
         props : {
             totalPages     : { type : Number },
             totalWords     : { type : Number },
-            totalPagesRead : { type : Number },
             readLogs       : { type : Array }, // TODO: process logs
         },
 
@@ -51,7 +50,9 @@
             return {
                 pct_read       : 0,
                 wpm            : 0,
-                words_per_page : 0
+                words_per_page : 0,
+                total_pages_read : 0,
+                total_logged_time : 0
             };
         },
 
@@ -113,13 +114,7 @@
              * @returns {String}
              */
             displaySpentTime() {
-                let totalLoggedTime = 0; // in minutes, for example
-                let remainingPages =  this.totalPages - this.totalPagesRead;
-                let estReadWords = this.words_per_page * this.totalPagesRead;
-                // TODO: calculate total logged time from logs
-                totalLoggedTime = this.simplifyTime(estReadWords / this.wpm);
-
-                return `You spent ${ totalLoggedTime } reading this book`;
+                return `You spent ${ this.simplifyTime(this.total_logged_time) } reading this book`;
             },
 
             /**
@@ -130,7 +125,7 @@
             displayPctCompleted() {
                 // TODO: calculate total pages read from logs
                 const roundoff_places = 2;
-                let unrounded = this.totalPagesRead / this.totalPages;
+                let unrounded = this.total_pages_read / this.totalPages;
                 unrounded *= Math.pow(10, roundoff_places + 2);
                 let rounded = Math.round(unrounded);
                 this.pct_read = rounded / Math.pow(10, roundoff_places);
@@ -144,7 +139,7 @@
              * @returns {Number}
              */
             calcRemainingMins() {
-                let remainingPages =  this.totalPages - this.totalPagesRead;
+                let remainingPages =  this.totalPages - this.total_pages_read;
                 let estRemainingWords = this.words_per_page * remainingPages;
 
                 return estRemainingWords / this.wpm;
@@ -165,14 +160,40 @@
                 }
 
                 return this.simplifyTime(remainingMins);
+            },
+
+            /**
+             * Calculate the progress for the book based on the logs
+             */
+            processLogsData() {
+                this.total_pages_read = 0;
+                this.total_logged_time = 0;
+                this.wpm = 0;
+
+                for (let log of this.readLogs) {
+                    let current_pages_read = log.pages_read;
+                    let logged_time_in_min = Math.floor((log.end_time - log.start_time) / 60);
+
+                    this.total_pages_read += current_pages_read;
+                    this.total_logged_time += logged_time_in_min;
+                    this.wpm += (current_pages_read * this.words_per_page) / logged_time_in_min;
+                }
+
+                this.wpm /= this.readLogs.length;
+
+                window.eventBus.$emit('share-logs', this.readLogs);
             }
         },
 
-        mounted() {
-            // Calculate words per page
+        created() {
             this.words_per_page = this.totalWords / this.totalPages;
+            this.processLogsData();
+        },
 
-            this.calcWordsPerMin();
+        watch : {
+            readLogs() {
+                this.processLogsData();
+            }
         }
     }
 </script>

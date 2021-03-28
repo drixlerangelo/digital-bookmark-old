@@ -13,6 +13,8 @@
             @mouseleave="showCalloutMessage"
             ref="input"
             :title="tooltip"
+            :min="min"
+            :max="max"
         >
         <div
             v-if="validationPassed === false && useCallout === false"
@@ -43,7 +45,9 @@
             small          : { type : Boolean },
             useCallout     : { type : Boolean },
             isIntegerOnly  : { type : Boolean },
-            errorFontSize  : { type : Number }
+            errorFontSize  : { type : Number },
+            min            : { type : String|Number, default : '' },
+            max            : { type : String|Number, default : '' },
         },
 
         data() {
@@ -116,14 +120,12 @@
              * Automatically make the validation fail when an error is found
              */
             errorMessage() {
-                if (this.errorMessage.length > 0) {
-                    this.validationPassed = false;
-                }
+                this.validationPassed = (this.errorMessage.length === 0);
             }
         },
 
         created() {
-            const allowedTypes = ['text', 'password', 'number', 'time'];
+            const allowedTypes = ['text', 'password', 'number', 'time', 'date'];
             this.typeData = (allowedTypes.indexOf(this.type) === -1) ? 'text' : this.type;
 
             if (this.rounded === true) {

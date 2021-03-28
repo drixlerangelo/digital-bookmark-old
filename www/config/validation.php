@@ -143,7 +143,7 @@ return [
      * - This parameter is required. It follows the format "Y-m-d H:i". It is different from the end datetime.
      */
     'datetimeFrom' => [
-        'rules' => ['required', 'date_format:Y-m-d H:i', 'before:datetimeTo', 'before:now']
+        'rules' => ['required', 'date_format:Y-m-d H:i', 'before:datetimeTo', 'before:now', 'after:5 years ago']
     ],
 
     /**
@@ -151,6 +151,15 @@ return [
      * - This parameter is required. It follows the format "Y-m-d H:i". It is different from the start datetime.
      */
     'datetimeTo' => [
-        'rules' => ['required', 'date_format:Y-m-d H:i', 'after:datetimeFrom', 'before:now']
+        'rules' => ['required', 'date_format:Y-m-d H:i', 'after:datetimeFrom', 'before:now', 'after:5 years ago']
+    ],
+
+    /**
+     * DATE validation
+     * - This parameter is required. It follows the format "Y-m-d".
+     * It should not be in the future nor more than five years in the past.
+     */
+    'date' => [
+        'rules' => ['required', 'date_format:Y-m-d', 'before:now', 'after:5 years ago']
     ]
 ];

@@ -1,7 +1,7 @@
 <template>
     <modal title="Set a goal" @modal-proceed="registerGoal" @modal-close="modalClose" :action-disabled="validationFailed">
         <div class="new-goal-info">
-            <p>Pages to Read per hour</p>
+            <p>Pages to Read per day</p>
             <div class="pages-to-read-holder">
                 <textfield
                     type="number"

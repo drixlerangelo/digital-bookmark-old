@@ -88,15 +88,18 @@
     line-height: 1px;
 }
 
-.coming-soon::before {
+.coming-soon::before, .todo-add-book::before {
     content: 'Coming Soon!';
     color: #BF1B28;
     font-size: 10px;
     position: absolute;
+}
+
+.coming-soon::before {
     top: -3px;
 }
 
-.coming-soon, .coming-soon:hover {
+.coming-soon, .coming-soon:hover, .todo-add-book, .todo-add-book:hover {
     color: #C4C4C4 !important;
     cursor: not-allowed !important;
 }
@@ -105,10 +108,20 @@
     margin-top: 3em;
 }
 
+.todo-add-book::before {
+    top: 5px;
+    right: 30px;
+    transform: rotate(10deg);
+}
+
 /* small mobile: up to 320px */
 @media screen and (max-width: 320px) {
     .modal-holder {
         width: 18em;
+    }
+
+    .todo-add-book::before {
+        right: 30px !important;
     }
 }
 
@@ -150,7 +163,19 @@
     }
 
     .even-spacing {
-        width: 90%;
+        margin-top: 2em;
+    }
+
+    .goal-message {
+        font-size: 14px;
+    }
+
+    .slider {
+        margin-top: 1.5em;
+    }
+
+    .todo-add-book::before {
+        right: 7em;
     }
 }
 
@@ -205,6 +230,10 @@
 
     .stage-title {
         font-size: 1em;
+    }
+
+    .todo-add-book::before {
+        right: 9px;
     }
 }
 
@@ -280,5 +309,9 @@
 
     .modal-holder {
         margin-top: 25em;
+    }
+
+    .todo-add-book::before {
+        right: 80px;
     }
 }

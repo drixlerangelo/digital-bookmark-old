@@ -29,5 +29,6 @@ window.axios.defaults.headers.post['Accept'] = 'application/json';
 // });
 
 window.Vue = require('vue');
+window.eventBus = new Vue();
 
 window.ErrorManager = require('./lib/error').default;

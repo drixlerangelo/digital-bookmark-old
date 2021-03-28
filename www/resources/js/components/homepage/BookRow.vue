@@ -1,5 +1,5 @@
 <template>
-    <div class="book-item slide-down" :style="setAnimationDelay()">
+    <div class="book-item slide-down" :style="setAnimationDelay()" @click="startLog">
         <div class="book-cover" :style="setCoverBg()"></div>
         <div class="book-info">
             <div class="book-details">
@@ -15,7 +15,6 @@
                 :total-pages="parseInt(book.num_pages)"
                 :read-logs="book.logs"
                 :total-words="parseInt(book.num_words)"
-                :total-pages-read="total_pages_read"
             ></book-progress>
         </div>
     </div>
@@ -47,12 +46,6 @@
 
         components : {
             'book-progress' : BookProgress
-        },
-
-        data() {
-            return {
-                total_pages_read : 0
-            };
         },
 
         methods : {
@@ -153,11 +146,13 @@
             displayShortenedWords() {
                 return this.limitNumDisplayed(this.book.num_words, DISPLAY_CEIL) + ' words';
             },
-        },
 
-        mounted() {
-            // TODO: calculate total pages read
-            this.total_pages_read = Math.floor(this.book.num_pages * 0.91); // 91% of all pages were read
+            /**
+             * Sends a signal to open the create log modal
+             */
+            startLog() {
+                window.eventBus.$emit('start-log', this.book);
+            }
         }
     }
 </script>
@@ -173,6 +168,7 @@
         box-sizing: border-box;
         border-radius: 10px;
         display: flex;
+        cursor: pointer;
 
         /* animation */
         -webkit-animation-duration: 1s;
