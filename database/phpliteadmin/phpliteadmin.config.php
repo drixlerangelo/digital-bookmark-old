@@ -1,4 +1,4 @@
-<?php 
+<?php
 //
 // This is sample configuration file
 //
@@ -9,11 +9,11 @@
 //
 // Please see https://bitbucket.org/phpliteadmin/public/wiki/Configuration for more details
 
-//password to gain access
-$password = getenv('DB_PASSWORD');
-
 //directory relative to this file to search for databases (if false, manually list databases in the $databases variable)
 $directory = '/home/user/database/storage';
+
+//password to gain access
+$password = trim(file_get_contents($directory . '/DB_PASSWORD'));
 
 //whether or not to scan the subdirectories of the above directory infinitely deep
 $subdirectories = false;
