@@ -132,7 +132,8 @@
                     '/log/register',
                     payload
                 ).then(function ({ data }) {
-                    const newLog = data.data.log;
+                    let newLog = data.data.log;
+                    newLog.old_status = this.book.status;
 
                     window.eventBus.$emit('log-created', newLog);
                 }.bind(this)

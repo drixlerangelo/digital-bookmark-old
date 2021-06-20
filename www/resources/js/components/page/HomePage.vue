@@ -166,6 +166,7 @@
                     if (entries.length > 0) {
                         for (let index = 0; index < entries.length; index ++) {
                             let entry = entries[index];
+                            entry.status_id = parseInt(entry.status_id);
                             this.convertLogsData(entry);
 
                             this.entries[entry.status].push(entry);
@@ -253,6 +254,27 @@
                         log.end_time = new Date(log.end_time).getTime() / 1000;
                     }
                 }
+            },
+
+            /**
+             * Change the status of a to-do book to doing
+             *
+             * @param {Object} log
+             */
+            transitionTodo(log) {
+                if (log.old_status === 'todo') {
+                    let entries = this.entries;
+
+                    this.entries.todo = this.entries.todo.filter(function (book) {
+                        if (book.status_id === log.status_id) {
+                            book.status = 'doing';
+                            book.logs = [];
+                            entries.doing.push(book);
+                        }
+
+                        return book.status_id !== log.status_id;
+                    });
+                }
             }
         },
 
@@ -287,6 +309,8 @@
             }.bind(this));
 
             window.eventBus.$on('log-created', function (log) {
+                this.transitionTodo(log);
+
                 for (let index = 0; index < this.entries.doing.length; index++) {
                     let book = this.entries.doing[index];
 

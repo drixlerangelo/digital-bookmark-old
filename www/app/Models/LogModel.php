@@ -28,4 +28,12 @@ class LogModel extends Model
      * @var array
      */
     protected $hidden = ['created_at', 'updated_at'];
+
+    /**
+     * Creates the relationship between logs and its status
+     */
+    public function linkStatus()
+    {
+        return $this->belongsTo(StatusModel::class, 'status_id');
+    }
 }

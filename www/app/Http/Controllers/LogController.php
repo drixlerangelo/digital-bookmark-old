@@ -70,6 +70,7 @@ class LogController extends Controller
         $this->logModel->end_time = $validatedInputs['datetimeTo'];
 
         if ($this->logModel->save()) {
+            $this->changeStatus();
             $this->responseMsg = 'Successfully added your log.';
             $this->responseData['wasPassed'] = true;
             $this->responseData['log'] = [
@@ -77,7 +78,8 @@ class LogController extends Controller
                 'status_id'  => $this->logModel->status_id,
                 'pages_read' => $this->logModel->pages_read,
                 'start_time' => strtotime($this->logModel->start_time),
-                'end_time'   => strtotime($this->logModel->end_time)
+                'end_time'   => strtotime($this->logModel->end_time),
+                'status'     => $this->logModel->linkStatus->status
             ];
 
             return $this->makeResponse();
@@ -190,6 +192,17 @@ class LogController extends Controller
         if ($this->logStatusFailed = count($checkResult) > 0) {
             $messageIndex = array_keys($checkResult)[0];
             $this->setErrorStatus($errorMessages[$messageIndex], $errorData[$messageIndex]);
+        }
+    }
+
+    /**
+     * Automatically changes the status of the book based on its logs
+     */
+    private function changeStatus()
+    {
+        if ($this->logModel->linkStatus->status === 'todo') {
+            $this->logModel->linkStatus->status = 'doing';
+            $this->logModel->linkStatus->save();
         }
     }
 
