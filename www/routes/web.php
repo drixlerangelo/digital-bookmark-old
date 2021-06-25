@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('status')->group(function () {
         Route::get('all', [StatusController::class, 'fetchStatus'])->name('entries');
+        Route::post('change', [StatusController::class, 'changeStatus'])->name('edit.status');
     });
 
     Route::prefix('book')->group(function () {

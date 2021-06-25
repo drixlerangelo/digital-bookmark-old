@@ -69,6 +69,30 @@ class StatusController extends Controller
         return $this->makeResponse();
     }
 
+    /**
+     * Transitions the book's status
+     *
+     * @return mixed
+     */
+    public function changeStatus()
+    {
+        $this->onlyJson = true;
+
+        $params = Validator::make(request()->only(['id', 'status']), [
+            'id'     => config('validation.statusId.rules'),
+            'status' => config('validation.stage.rules')
+        ])->validate();
+
+        $status = $this->statusModel->find($params['id']);
+        $status->status = $params['status'];
+
+        return $this->makeSaveResponse(
+            $status->save(),
+            'Status changed.',
+            'Status not changed.'
+        );
+    }
+
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
 

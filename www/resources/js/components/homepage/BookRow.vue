@@ -1,5 +1,10 @@
 <template>
-    <div class="book-item slide-down" :style="setAnimationDelay()" @click="startLog">
+    <div class="book-item slide-down"
+        :style="setAnimationDelay()"
+        @click="startLog"
+        draggable="true"
+        @dragstart="carryBook"
+        @dragend="dropBook">
         <div class="book-cover" :style="setCoverBg()"></div>
         <div class="book-info">
             <div class="book-details">
@@ -152,6 +157,20 @@
              */
             startLog() {
                 window.eventBus.$emit('start-log', this.book);
+            },
+
+            /**
+             * Broadcast that the book is being carried
+             */
+            carryBook() {
+                window.eventBus.$emit('carry-item', this.book);
+            },
+
+            /**
+             * Broadcast that the book was dropped
+             */
+            dropBook() {
+                window.eventBus.$emit('drop-item');
             }
         }
     }

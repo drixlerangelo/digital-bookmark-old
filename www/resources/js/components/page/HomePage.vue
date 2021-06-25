@@ -14,18 +14,21 @@
                     ref="todo"
                     style="margin-right: 5%;"
                     @prompt-book-registration="prepareBookRegistration"
+                    @capture-container="assignStatus('todo')"
                 >Books To Read</books-holder>
                 <books-holder
                     :entries="entries.doing"
                     stage="doing"
                     ref="doing"
                     @prompt-book-registration="prepareBookRegistration"
+                    @capture-container="assignStatus('doing')"
                 >Currently Reading</books-holder>
                 <books-holder
                     :entries="entries.done"
                     stage="done"
                     ref="done"
                     style="margin-left: 5%;"
+                    @capture-container="assignStatus('done')"
                 >Books Completed</books-holder>
             </div>
         </div>
@@ -275,6 +278,43 @@
                         return book.status_id !== log.status_id;
                     });
                 }
+            },
+
+            /**
+             * Assigns the new status for the book being carried
+             *
+             * @param {String} status
+             */
+            assignStatus(status) {
+                this.newStatus = status;
+            },
+
+            /**
+             * Changes the status of the book being carried
+             */
+            changeStatus() {
+                let oldStatus = this.carriedBook.status;
+
+                if (oldStatus !== this.newStatus) {
+                    axios.post(
+                        '/status/change',
+                        { id : this.carriedBook.status_id, status : this.newStatus }
+                    ).then(function ({ data }) {
+                        alert(data.message);
+
+                        let selectedStatus = this.entries[oldStatus];
+
+                        this.entries[oldStatus] = selectedStatus.filter(function (book) {
+                            return book.status_id !== this.carriedBook.status_id;
+                        }.bind(this));
+
+                        this.carriedBook.status = this.newStatus;
+                        this.carriedBook.logs = this.carriedBook.logs || [];
+                        this.entries[this.newStatus].push(this.carriedBook);
+                    }.bind(this)).catch(function ({ response }) {
+                        this.$emit('error-found', response.data);
+                    }.bind(this));
+                }
             }
         },
 
@@ -285,7 +325,9 @@
                 newBookModal : { stage : '', active : false },
                 goalModalActive : false,
                 reminder : {},
-                newLogModal : {active : false, book : {}}
+                newLogModal : {active : false, book : {}},
+                carriedBook : {},
+                newStatus : ''
             };
         },
 
@@ -319,6 +361,14 @@
                     }
                 }
                 this.finishBookLog();
+            }.bind(this));
+
+            window.eventBus.$on('carry-item', function (book) {
+                this.carriedBook = book;
+            }.bind(this));
+
+            window.eventBus.$on('drop-item', function () {
+                this.changeStatus();
             }.bind(this));
         }
     }

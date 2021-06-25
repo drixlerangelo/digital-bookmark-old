@@ -78,20 +78,11 @@ class UserController
         $this->userModel->username = $validatedCredentials['username'];
         $this->userModel->password = Hash::make($validatedCredentials['password']);
 
-        $isSaved = $this->userModel->save();
-
-        if ($isSaved) {
-            $this->responseMsg = 'Registration successful.';
-            $this->responseData['wasPassed'] = true;
-
-            return $this->makeResponse();
-        }
-
-        $this->setErrorStatus('Registration unsuccessful.');
-        $this->responseData['wasPassed'] = false;
-        $this->responseCode = 500;
-
-        return $this->makeResponse();
+        return $this->makeSaveResponse(
+            $this->userModel->save(),
+            'Registration successful.',
+            'Registration unsuccessful.'
+        );
     }
 
     /**

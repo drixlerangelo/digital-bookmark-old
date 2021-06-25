@@ -1,5 +1,5 @@
 <template>
-    <div class="slide">
+    <div class="slide" @dragover="recordContainer">
         <div class="stage-overview">
             <span class="stage-title">
                 <slot></slot>
@@ -38,10 +38,14 @@
              * Trigger for showing the book registration form
              */
             showBookForm() {
-                if (this.stage === 'doing') { // TODO: Remove if changing status is available
-                    this.$emit('prompt-book-registration', this.stage);
-                }
+                this.$emit('prompt-book-registration', this.stage);
+            },
 
+            /**
+             * Broadcast the container the book is currently hovering
+             */
+            recordContainer() {
+                this.$emit('capture-container');
             }
         }
     }

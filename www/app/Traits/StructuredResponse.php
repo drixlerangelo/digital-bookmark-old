@@ -124,4 +124,31 @@ trait StructuredResponse
             $this->errorData[$field][] = $message;
         }
     }
+
+    /**
+     * Create a response after saving an item
+     *
+     * @param bool   $isSaved
+     *
+     * @param string $successMsg
+     *
+     * @param string $failureMsg
+     *
+     * @return mixed
+     */
+    protected function makeSaveResponse($isSaved, $successMsg, $failureMsg)
+    {
+        if ($isSaved) {
+            $this->responseMsg = $successMsg;
+            $this->responseData['wasPassed'] = true;
+
+            return $this->makeResponse();
+        }
+
+        $this->setErrorStatus($failureMsg);
+        $this->responseData['wasPassed'] = false;
+        $this->responseCode = 500;
+
+        return $this->makeResponse();
+    }
 }
