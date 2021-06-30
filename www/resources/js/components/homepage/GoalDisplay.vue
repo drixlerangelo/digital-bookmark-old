@@ -64,7 +64,7 @@
                     'Better get started!',
                     '%s day/s to go this week!',
                     'You overdid yourself today!',
-                    'Good going, %s pages to go!',
+                    'Good going, %s page(s) to go!',
                     'Daily goal achieved, nice work!',
                     'You have no daily goal for today!'
                 ],
@@ -72,7 +72,8 @@
                 daysPagesRead : {},
                 reminderDays : [],
                 reminderTimestamps : [],
-                goalTooltip : ''
+                goalTooltip : '',
+                timestampToday : 0
             };
         },
 
@@ -106,7 +107,7 @@
 
                     adjustedDate.setMilliseconds(0);
                     adjustedDate.setHours(0, 0, 0);
-                    adjustedDate.setDate(adjustedDate.getDate() - day);
+                    adjustedDate.setDate(adjustedDate.getDate() - (adjustedDate.getDay() - day));
 
                     this.daysPagesRead[adjustedDate.getTime()] = 0;
                 }
@@ -120,19 +121,17 @@
                 this.reminderTimestamps = [];
 
                 for (let day of this.reminderDays) {
-                    if (this.days[day] <= dayToday) {
-                        let dayRelPos = dayToday - this.days[day];
-                        let reminderDate = new Date();
+                    let dayRelPos = this.days[day] - dayToday;
+                    let reminderDate = new Date();
 
-                        reminderDate.setDate(reminderDate.getDate() - dayRelPos);
-                        reminderDate.setMilliseconds(0);
-                        reminderDate.setHours(0, 0, 0);
+                    reminderDate.setDate(reminderDate.getDate() + dayRelPos);
+                    reminderDate.setMilliseconds(0);
+                    reminderDate.setHours(0, 0, 0);
 
-                        let reminderTimestamp = reminderDate.getTime();
+                    let reminderTimestamp = reminderDate.getTime();
 
-                        if (this.reminderTimestamps.indexOf(reminderTimestamp) === -1) {
-                            this.reminderTimestamps.push(reminderTimestamp);
-                        }
+                    if (this.reminderTimestamps.indexOf(reminderTimestamp) === -1) {
+                        this.reminderTimestamps.push(reminderTimestamp);
                     }
                 }
             },
@@ -173,7 +172,9 @@
                     daysReadCount += (this.reminderTimestamps.indexOf(timestamp) !== 1 && pagesRead > 0) ? 1 : 0;
                 }
 
-                this.goalProgress = parseInt((totalPagesRead / totalPagesToRead) * 10000) / 100;
+                this.goalProgress = (this.reminderTimestamps.indexOf(this.timestampToday) !== -1)
+                    ? parseInt((totalPagesRead / totalPagesToRead) * 10000) / 100
+                    : 0;
                 this.goalTooltip = `You've read in ${daysReadCount} out of ${this.reminderTimestamps.length} days.`;
                 this.goalTooltip += ` That's a progress of around ${this.goalProgress}%.`;
             },
@@ -182,16 +183,14 @@
              * Calculate the daily goal if it has been achieved and send out an appropriate message
              */
             calcTodaysProgress() {
-                let today = new Date();
+                let today = new Date(this.timestampToday);
                 let reminderPagesToRead = parseInt(this.reminder.pages_to_read);
+                let todaysRead = this.daysPagesRead[this.timestampToday];
 
-                today.setMilliseconds(0);
-                today.setHours(0, 0, 0);
-
-                let timestampToday = today.getTime();
-                let todaysRead = this.daysPagesRead[timestampToday];
-
-                if (todaysRead === 0) {
+                if (this.reminderTimestamps.indexOf(this.timestampToday) === -1) {
+                    this.currentMessage = this.messages[MSG_GOAL_HOLIDAY];
+                    this.goalTooltip = 'Nothing to see here. Enjoy your day!';
+                } else if (todaysRead === 0) {
                     let daysLeft = this.reminderDays.filter(function (day) {
                         return this.days[day] >= today.getDate();
                     }.bind(this)).length;
@@ -200,8 +199,6 @@
                     this.currentMessage = this.messages[MSG_GOAL_OVERDID];
                 } else if (todaysRead === reminderPagesToRead) {
                     this.currentMessage = this.messages[MSG_GOAL_ACHIEVED];
-                } else if (this.reminderTimestamps.indexOf(timestampToday) === -1) {
-                    this.currentMessage = this.messages[MSG_GOAL_HOLIDAY];
                 } else {
                     let remainingPages = reminderPagesToRead - todaysRead;
                     this.currentMessage = this.messages[MSG_TO_GET_GOAL].replace('%s', remainingPages);
@@ -210,6 +207,13 @@
         },
 
         created() {
+            let today = new Date();
+
+            today.setMilliseconds(0);
+            today.setHours(0, 0, 0);
+
+            this.timestampToday = today.getTime();
+
             this.checkForReminders();
             this.findCurrentWeekRange();
 
