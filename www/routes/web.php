@@ -55,5 +55,6 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('log')->group(function () {
         Route::post('register', [LogController::class, 'registerLog'])->name('log.create');
+        Route::get('current', [LogController::class, 'getCurrentLogs'])->name('log.current');
     });
 });

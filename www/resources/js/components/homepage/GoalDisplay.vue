@@ -83,6 +83,7 @@
              */
             checkForReminders() {
                 let hasReminder = Object.keys(this.reminder).length > 0;
+                this.updateCurrentTimestamp();
 
                 if (hasReminder) {
                     this.reminderDays = this.reminder.days.split(',');
@@ -140,6 +141,8 @@
              * Sum all the pages read of the current week
              */
             processCurrentWeekLogs() {
+                this.findCurrentWeekRange();
+
                 for (let log of this.logs) {
                     let dtStart = new Date(log.start_time * 1000);
                     dtStart.setHours(0, 0, 0);
@@ -203,22 +206,53 @@
                     let remainingPages = reminderPagesToRead - todaysRead;
                     this.currentMessage = this.messages[MSG_TO_GET_GOAL].replace('%s', remainingPages);
                 }
+            },
+
+            /**
+             * Change the current timestamp
+             */
+            updateCurrentTimestamp() {
+                let today = new Date();
+
+                today.setMilliseconds(0);
+                today.setHours(0, 0, 0);
+
+                this.timestampToday = today.getTime();
+            },
+
+            /**
+             * Prevents duplicate logs
+             *
+             * @param {Array} logs
+             */
+            filterNewLog(logs) {
+                for (let log of logs) {
+                    const indexes = ArrayHelper.arrayColumn('id', this.logs);
+
+                    if (indexes.indexOf(log.id) === -1) {
+                        this.logs.push(log);
+                    }
+                }
+            },
+
+            /**
+             * Fetch the current week's logs
+             */
+            fetchCurrentWeekLogs() {
+                axios.get('/log/current')
+                .then(function ({ data }) {
+                    this.filterNewLog(data.data.logs);
+                    this.checkForReminders();
+                }.bind(this));
             }
         },
 
         created() {
-            let today = new Date();
-
-            today.setMilliseconds(0);
-            today.setHours(0, 0, 0);
-
-            this.timestampToday = today.getTime();
-
+            this.fetchCurrentWeekLogs();
             this.checkForReminders();
-            this.findCurrentWeekRange();
 
             window.eventBus.$on('share-logs', function (logs) {
-                this.logs = logs;
+                this.filterNewLog(logs);
                 this.checkForReminders();
             }.bind(this));
         },

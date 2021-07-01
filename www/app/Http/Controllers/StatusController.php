@@ -105,13 +105,11 @@ class StatusController extends Controller
      */
     private function fetchLogs($entry)
     {
-        if ($entry['status'] === 'doing') {
-            $entry['logs'] = $this->statusModel
-                ->where('id', $entry['status_id'])
-                ->first()
-                ->linkLog
-                ->toArray();
-        }
+        $entry['logs'] = $this->statusModel
+            ->where('id', $entry['status_id'])
+            ->first()
+            ->linkLog
+            ->toArray();
 
         return $entry;
     }

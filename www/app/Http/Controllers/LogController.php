@@ -92,6 +92,56 @@ class LogController extends Controller
         return $this->makeResponse();
     }
 
+    /**
+     * Fetch the current week's logs
+     *
+     * @return mixed
+     */
+    public function getCurrentLogs()
+    {
+        $this->onlyJson = true;
+
+        $daysIndexes = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        $userReminder = \Auth::user()->linkReminder->where('delete_status', false)->first();
+        $reminderDays = explode(',', $userReminder->days);
+
+        $this->logModel = $this->logModel->where(function ($query) use ($reminderDays, $daysIndexes) {
+            foreach ($reminderDays as $day) {
+                $daysIndex = array_search($day, $daysIndexes);
+                $indexToday = (int) date('w');
+                $relativePosFromToday = $daysIndex - $indexToday;
+
+                $startDt = date('Y-m-d 00:00', strtotime($relativePosFromToday . ' days'));
+                $endDt = date('Y-m-d 23:59', strtotime($relativePosFromToday . ' days'));
+                $dateRange = [$startDt, $endDt];
+
+                $query->orWhere(function($query) use($dateRange) {
+                    $query->whereBetween('logs.start_time', $dateRange)
+                          ->orWhereBetween('logs.end_time', $dateRange);
+                });
+            }
+        });
+
+        $this->logModel->whereIn('logs.status_id', function ($query) {
+            $query->select('statuses.id')
+                ->from('statuses')
+                ->where('statuses.user_id', \Auth::id());
+        });
+
+        $logs = $this->logModel->get()->toArray();
+
+        foreach ($logs as &$log) {
+            $log['start_time'] = strtotime($log['start_time']);
+            $log['end_time'] = strtotime($log['end_time']);
+            $log['status_id'] = (int) $log['status_id'];
+            $log['pages_read'] = (int) $log['pages_read'];
+        }
+
+        $this->responseData['logs'] = $logs;
+
+        return $this->makeResponse();
+    }
+
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
 

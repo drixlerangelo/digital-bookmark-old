@@ -246,16 +246,14 @@
              * @param {Object} entry
              */
             convertLogsData(entry) {
-                if (entry.status === 'doing') {
-                    for (let log of entry.logs) {
-                        // Make it an integer to avoid repetitive data type conversion
-                        log.status_id = parseInt(log.status_id);
-                        log.pages_read = parseInt(log.pages_read);
+                for (let log of entry.logs) {
+                    // Make it an integer to avoid repetitive data type conversion
+                    log.status_id = parseInt(log.status_id);
+                    log.pages_read = parseInt(log.pages_read);
 
-                        // Convert to a timestamp for ease in the calculation
-                        log.start_time = new Date(log.start_time).getTime() / 1000;
-                        log.end_time = new Date(log.end_time).getTime() / 1000;
-                    }
+                    // Convert to a timestamp for ease in the calculation
+                    log.start_time = new Date(log.start_time).getTime() / 1000;
+                    log.end_time = new Date(log.end_time).getTime() / 1000;
                 }
             },
 

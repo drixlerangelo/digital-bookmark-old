@@ -32,3 +32,4 @@ window.Vue = require('vue');
 window.eventBus = new Vue();
 
 window.ErrorManager = require('./lib/error').default;
+window.ArrayHelper = require('./lib/array').default;
