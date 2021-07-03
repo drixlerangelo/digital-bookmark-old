@@ -2,8 +2,8 @@
     <modal title="Log Book" @modal-proceed="addLog" @modal-close="modalClose" :action-disabled="validationFailed">
         <div class="log-modal">
             <div class="log-book">
-                <div>{{ book.name }}</div>
-                <div>{{ book.author }}</div>
+                <div class="log-book-title">{{ book.name }}</div>
+                <div class="log-book-author">{{ book.author }}</div>
             </div>
             <p>Pages Read</p>
             <div class="pages-read-holder">
@@ -335,5 +335,11 @@
     .log-book {
         text-align: center;
         color: #BF1B28;
+    }
+
+    .log-book-title, .log-book-author {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 </style>

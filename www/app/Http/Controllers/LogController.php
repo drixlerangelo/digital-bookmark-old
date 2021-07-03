@@ -103,7 +103,7 @@ class LogController extends Controller
 
         $daysIndexes = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
         $userReminder = \Auth::user()->linkReminder->where('delete_status', false)->first();
-        $reminderDays = explode(',', $userReminder->days);
+        $reminderDays = (isset($userReminder)) ? explode(',', $userReminder->days) : $daysIndexes;
 
         $this->logModel = $this->logModel->where(function ($query) use ($reminderDays, $daysIndexes) {
             foreach ($reminderDays as $day) {

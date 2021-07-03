@@ -1,5 +1,9 @@
 <template>
-    <modal title="Set a goal" @modal-proceed="registerGoal" @modal-close="modalClose" :action-disabled="validationFailed">
+    <modal title="Set a goal"
+        @modal-proceed="registerGoal"
+        @modal-close="modalClose"
+        :action-disabled="validationFailed"
+        :action-name="mode">
         <div class="new-goal-info">
             <p>Pages to Read per day</p>
             <div class="pages-to-read-holder">
@@ -14,6 +18,7 @@
                     :is-integer-only="true"
                     :validation-step="validatePagesToRead"
                     :error-message="errors.pagesToRead"
+                    ref="pagesToReadInput"
                 ></textfield>
             </div>
 
@@ -29,6 +34,7 @@
                         :error-font-size="12"
                         :validation-step="validateTimeFrame('From')"
                         :error-message="errors.timeFrom"
+                        ref="timeFromInput"
                     ></textfield>
                 </div>
                 <div class="time-to-holder">
@@ -41,6 +47,7 @@
                         :error-font-size="12"
                         :validation-step="validateTimeFrame('To')"
                         :error-message="errors.timeTo"
+                        ref="timeToInput"
                     ></textfield>
                 </div>
             </div>
@@ -48,7 +55,7 @@
             <p>Days</p>
             <div class="days-holder" @mouseover="toggleDaysCalloutMessage" @mouseleave="toggleDaysCalloutMessage">
                 <template v-for="(day, index) in days">
-                    <div class="day" @click="toggleDay($event, day)" :key="index">{{ day }}</div>
+                    <div :class="['day', checkIfSelected(day)]" @click="toggleDay($event, day)" :key="index">{{ day }}</div>
                 </template>
                 <div class="days-error-callout" ref="daysErrorCallout">{{ errors.days }}</div>
             </div>
@@ -89,7 +96,8 @@
                     pagesToRead : '',
                     days : ''
                 },
-                validationFailed : false
+                validationFailed : false,
+                mode : 'Register'
             };
         },
 
@@ -218,7 +226,7 @@
              */
             registerGoal() {
                 axios.post(
-                    '/reminder/register',
+                    '/reminder/' + this.mode.toLowerCase(),
                     this.goal
                 ).then(function ({ data }) {
                     const newGoal = data.data.reminder;
@@ -235,7 +243,53 @@
                         this.validationFailed = true;
                     }
                 }.bind(this));
+            },
+
+            /**
+             * Get the reminder info if there's already reminder info
+             */
+            extractExistingGoal() {
+                if (Object.keys(this.existingGoal).length > 0) {
+                    this.mode = 'Modify';
+                    this.goal.pagesToRead = this.existingGoal.pages_to_read;
+
+                    let [timeFrom, timeTo] = this.existingGoal.time_frame.split('-');
+                    this.goal.timeFrom = timeFrom;
+                    this.goal.timeTo = timeTo;
+
+                    this.goal.days = this.existingGoal.days.split(',');
+                }
+            },
+
+            /**
+             * Display the existing goal
+             */
+            displayExistingGoal() {
+                if (this.mode === 'Modify') {
+                    this.$refs.pagesToReadInput.$refs.input.value = this.goal.pagesToRead;
+                    this.$refs.timeFromInput.$refs.input.value = this.goal.timeFrom;
+                    this.$refs.timeToInput.$refs.input.value = this.goal.timeTo;
+                }
+            },
+
+            /**
+             * Checks if a given day is already selected to display it accordingly
+             *
+             * @param {String} day
+             *
+             * @returns {String}
+             */
+            checkIfSelected(day) {
+                return (this.goal.days.indexOf(day.toLowerCase()) !== -1) ? 'selected-day' : '';
             }
+        },
+
+        created() {
+            this.extractExistingGoal();
+        },
+
+        mounted() {
+            this.displayExistingGoal();
         }
     }
 </script>

@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('reminder')->group(function () {
         Route::post('register', [ReminderController::class, 'registerReminder'])->name('reminder.create');
+        Route::post('modify', [ReminderController::class, 'modifyReminder'])->name('reminder.edit');
     });
 
     Route::prefix('log')->group(function () {

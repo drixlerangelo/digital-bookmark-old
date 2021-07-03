@@ -22,7 +22,7 @@
                     </a>
 
                     <div class="navbar-dropdown is-right">
-                        <a class="navbar-item coming-soon" ref="goalSetup" @click="showGoalModal">
+                        <a class="navbar-item" ref="goalSetup" @click="showGoalModal">
                             Edit the goal
                         </a>
                         <hr class="navbar-divider">
@@ -69,7 +69,6 @@
                     if (this.hasReminder) {
                         this.changeGoalMenuMessage();
                     } else {
-                        this.$refs.goalSetup.classList.toggle('coming-soon', false);
                         this.$refs.goalSetup.innerText = 'Set the goal';
                     }
 
@@ -100,9 +99,7 @@
              * Trigger to start creating a goal
              */
             showGoalModal() {
-                if (this.hasReminder === false) {
-                    this.$emit('set-goal');
-                }
+                this.$emit('set-goal');
             },
 
             /**
@@ -110,7 +107,6 @@
              */
             changeGoalMenuMessage() {
                 this.hasReminder = true;
-                this.$refs.goalSetup.classList.toggle('coming-soon', true);
                 this.changeTarget();
                 this.$refs.goalSetup.innerText = 'Edit the goal';
             }

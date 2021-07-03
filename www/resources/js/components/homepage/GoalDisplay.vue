@@ -166,13 +166,16 @@
                 let totalPagesRead = 0;
 
                 for (let timestamp in this.daysPagesRead) {
+                    timestamp = parseInt(timestamp);
                     let pagesRead = this.daysPagesRead[timestamp];
 
-                    totalPagesRead += (reminderPagesToRead < pagesRead)
-                        ? reminderPagesToRead
-                        : pagesRead;
+                    if (this.reminderTimestamps.indexOf(timestamp) !== -1) {
+                        totalPagesRead += (reminderPagesToRead < pagesRead)
+                            ? reminderPagesToRead
+                            : pagesRead;
 
-                    daysReadCount += (this.reminderTimestamps.indexOf(timestamp) !== 1 && pagesRead > 0) ? 1 : 0;
+                        daysReadCount += (pagesRead > 0) ? 1 : 0;
+                    }
                 }
 
                 this.goalProgress = (this.reminderTimestamps.indexOf(this.timestampToday) !== -1)
@@ -186,7 +189,6 @@
              * Calculate the daily goal if it has been achieved and send out an appropriate message
              */
             calcTodaysProgress() {
-                let today = new Date(this.timestampToday);
                 let reminderPagesToRead = parseInt(this.reminder.pages_to_read);
                 let todaysRead = this.daysPagesRead[this.timestampToday];
 
@@ -194,8 +196,8 @@
                     this.currentMessage = this.messages[MSG_GOAL_HOLIDAY];
                     this.goalTooltip = 'Nothing to see here. Enjoy your day!';
                 } else if (todaysRead === 0) {
-                    let daysLeft = this.reminderDays.filter(function (day) {
-                        return this.days[day] >= today.getDate();
+                    let daysLeft = this.reminderTimestamps.filter(function (timestamp) {
+                        return timestamp >= this.timestampToday;
                     }.bind(this)).length;
                     this.currentMessage = this.messages[MSG_AFTER_LOGIN].replace('%s', daysLeft);
                 } else if (todaysRead > reminderPagesToRead) {

@@ -11,7 +11,6 @@ namespace App\Http\Controllers;
 use App\Models\ReminderModel;
 use App\Traits\StructuredResponse;
 use App\Traits\CleanedValidation;
-use Illuminate\Http\Request;
 
 class ReminderController extends Controller
 {
@@ -72,13 +71,8 @@ class ReminderController extends Controller
             return $this->makeResponse();
         }
 
-        // Prevent duplication
-        $validDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-        $validDays = array_filter($validDays, function ($day) use ($validatedInputs) { return in_array($day, $validatedInputs['days']); });
-        $validatedInputs['days'] = implode(',', $validDays);
-
         $this->reminderModel->user_id = (int) \Auth::id();
-        $this->reminderModel->pages_to_read = $validatedInputs['pagesToRead'];
+        $this->reminderModel->pages_to_read = (int) $validatedInputs['pagesToRead'];
         $this->reminderModel->time_frame = sprintf('%s-%s', $validatedInputs['timeFrom'], $validatedInputs['timeTo']);
         $this->reminderModel->days = $validatedInputs['days'];
         $this->reminderModel->delete_status = false;
@@ -102,6 +96,42 @@ class ReminderController extends Controller
         return $this->makeResponse();
     }
 
+    /**
+     * Request for the goal to be modified
+     *
+     * @return mixed
+     */
+    public function modifyReminder()
+    {
+        $validatedInputs = $this->validateReminder();
+        $this->reminderModel = $this->reminderModel
+            ->where('delete_status', false)
+            ->where('user_id', \Auth::id())
+            ->first();
+
+        $this->reminderModel->pages_to_read = (int) $validatedInputs['pagesToRead'];
+        $this->reminderModel->time_frame = sprintf('%s-%s', $validatedInputs['timeFrom'], $validatedInputs['timeTo']);
+        $this->reminderModel->days = $validatedInputs['days'];
+
+        if ($this->reminderModel->save()) {
+            $this->responseMsg = 'Goal updated successfully.';
+            $this->responseData['wasPassed'] = true;
+            $this->responseData['reminder'] = [
+                'pages_to_read' => $this->reminderModel->pages_to_read,
+                'time_frame'    => $this->reminderModel->time_frame,
+                'days'          => $this->reminderModel->days
+            ];
+
+            return $this->makeResponse();
+        }
+
+        $this->setErrorStatus('Goal not successfully updated.');
+        $this->responseData['wasPassed'] = false;
+        $this->responseCode = 500;
+
+        return $this->makeResponse();
+    }
+
     /*----------------------------------------------Request Functions-------------------------------------------------*/
     /*------------------------------------------------Logic Functions-------------------------------------------------*/
 
@@ -116,7 +146,14 @@ class ReminderController extends Controller
         $parameters = $this->prepareInputs();
         $rules = $this->fetchRules();
 
-        return $this->conductTest($parameters, $rules);
+        $validatedInputs = $this->conductTest($parameters, $rules);
+
+        // Prevent duplication
+        $validDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        $validDays = array_filter($validDays, function ($day) use ($validatedInputs) { return in_array($day, $validatedInputs['days']); });
+        $validatedInputs['days'] = implode(',', $validDays);
+
+        return $validatedInputs;
     }
 
     /**

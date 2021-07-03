@@ -1,6 +1,11 @@
 <template>
     <div>
-        <navbar :username="username" @reminder-checked="showGoalReminder" @set-goal="prepareGoalCreation" ref="navbar"></navbar>
+        <navbar
+            :username="username"
+            @reminder-checked="showGoalReminder"
+            @set-goal="prepareGoalCreation"
+            ref="navbar"
+        ></navbar>
 
         <goal-display
             :reminder="reminder"
@@ -52,6 +57,7 @@
             v-if="goalModalActive"
             @modal-close="finishGoalCreation"
             @goal-created="setupGoalView"
+            :existing-goal="reminder"
         ></set-goal-modal>
 
         <log-book-modal
@@ -152,7 +158,7 @@
              * @param {Object}
              */
             showGoalReminder({ hasReminder, reminder }) {
-                this.reminder = reminder;
+                this.reminder = (reminder instanceof Array) ? {} : reminder;
 
                 if (hasReminder === false) {
                     this.$refs.notifDialog.openNotif('No goal set', 'You have not yet set a goal.');
@@ -322,7 +328,7 @@
                 entries : { todo : [], doing : [], done : [] },
                 newBookModal : { stage : '', active : false },
                 goalModalActive : false,
-                reminder : {},
+                reminder : Object(),
                 newLogModal : {active : false, book : {}},
                 carriedBook : {},
                 newStatus : ''
