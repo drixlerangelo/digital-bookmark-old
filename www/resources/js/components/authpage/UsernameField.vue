@@ -44,9 +44,11 @@
              *
              * @param {String} username
              *
+             * @param {Object} event
+             *
              * @returns {Boolean}
              */
-            validate(username) {
+            validate(username, event) {
                 const field = 'username';
 
                 Validator.setParams(field, username);
@@ -59,7 +61,8 @@
 
                 this.$emit('value-changed', {
                     target  : field,
-                    value   : username
+                    value   : username,
+                    event
                 });
 
                 return this.passed;

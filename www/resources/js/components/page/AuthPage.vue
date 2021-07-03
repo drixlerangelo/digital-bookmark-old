@@ -18,11 +18,13 @@
                             :external-errors="errors.username"
                             :processing="inputsDisabled"
                             @value-changed="handleInput"
+                            ref="usernameInput"
                         ></username-field>
                         <password-field
                             :external-errors="errors.password"
                             :processing="inputsDisabled"
                             @value-changed="handleInput"
+                            ref="passwordInput"
                         ></password-field>
                     </div>
 
@@ -90,6 +92,24 @@
             handleInput(data) {
                 this.userData[data.target] = data.value;
                 this.submitDisabled = window.ErrorManager.getStatus();
+                this.submitOnEnter(data.event);
+            },
+
+            /**
+             * Submits the form when an enter key is pressed
+             *
+             * @param {Object} event
+             */
+            submitOnEnter(event) {
+                let usernameInputVal = this.$refs.usernameInput.$refs.textField.$refs.input.value;
+                let passwordInputVal = this.$refs.passwordInput.$refs.textField.$refs.input.value;
+
+                let isEntered = event.type === 'keyup' && event.keyCode === 13;
+                let fieldsNotEmpty = usernameInputVal.length > 0 && passwordInputVal.length > 0;
+
+                if (isEntered && fieldsNotEmpty) {
+                    this.submitForm();
+                }
             },
 
             /**

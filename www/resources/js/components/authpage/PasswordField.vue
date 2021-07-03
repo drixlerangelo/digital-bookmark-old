@@ -45,9 +45,11 @@
              *
              * @param {String} password
              *
+             * @param {Object} event
+             *
              * @returns {Boolean}
              */
-            validateString(password) {
+            validateString(password, event) {
                 const field = 'password';
 
                 Validator.setParams(field, password);
@@ -60,7 +62,8 @@
 
                 this.$emit('value-changed', {
                     target  : field,
-                    value   : password
+                    value   : password,
+                    event
                 });
 
                 return this.passed;

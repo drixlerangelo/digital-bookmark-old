@@ -62,13 +62,15 @@
         methods : {
             /**
              * Gets the value the user entered to be validated
+             *
+             * @param {Object} event
              */
-            validate() {
+            validate(event) {
                 if (this.isIntegerOnly) {
                     this.$refs.input.value = this.$refs.input.value.replace(/[^0-9]/, '');
                 }
 
-                this.validationPassed = this.validationStep(this.$refs.input.value);
+                this.validationPassed = this.validationStep(this.$refs.input.value, event);
             },
 
             /**
