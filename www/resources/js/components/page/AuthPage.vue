@@ -151,7 +151,7 @@
                 this.errors = { username : [], password : [] };
 
                 if (authorization.granted) {
-                    alert(authorization.message);
+                    console.log(authorization.message);
                     location.href = '/';
                 }
             }

@@ -20,6 +20,7 @@
                 :total-pages="parseInt(book.num_pages)"
                 :read-logs="book.logs"
                 :total-words="parseInt(book.num_words)"
+                @totalReadUpdated="updateTotalPagesRead"
             ></book-progress>
         </div>
     </div>
@@ -51,6 +52,12 @@
 
         components : {
             'book-progress' : BookProgress
+        },
+
+        data() {
+            return {
+                total_pages_read : 0
+            };
         },
 
         methods : {
@@ -171,6 +178,19 @@
              */
             dropBook() {
                 window.eventBus.$emit('drop-item');
+            },
+
+            /**
+             * Updates the total pages read based on the calculation of logs
+             */
+            updateTotalPagesRead(totalPagesRead) {
+                this.total_pages_read = totalPagesRead;
+            }
+        },
+
+        watch : {
+            total_pages_read() {
+                this.$mount();
             }
         }
     }

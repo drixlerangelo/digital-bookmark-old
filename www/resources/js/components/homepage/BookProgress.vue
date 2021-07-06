@@ -4,7 +4,7 @@
             :title="displaySpentTime()"
         >{{ displayPctCompleted() }}</div>
         <div
-            :title="`${ displayRemaningMins() } left before completing the book`"
+            :title="displayRemaningMins()"
         >ETA: {{ displayRemaningMins(true) }}</div>
     </div>
 </template>
@@ -57,14 +57,6 @@
         },
 
         methods : {
-            /**
-             * Calculate words per minute
-             */
-            calcWordsPerMin() {
-                // TODO: Calculate words per minute (WPM)
-                this.wpm = 250; // for example
-            },
-
             /**
              * Represents the time in weeks, days, hours, and minutes
              *
@@ -142,7 +134,7 @@
                 let remainingPages =  this.totalPages - this.total_pages_read;
                 let estRemainingWords = this.words_per_page * remainingPages;
 
-                return estRemainingWords / this.wpm;
+                return (this.wpm === 0) ? 0 : estRemainingWords / this.wpm;
             },
 
             /**
@@ -154,12 +146,16 @@
              */
             displayRemaningMins(shortened = false) {
                 let remainingMins = this.calcRemainingMins();
+                remainingMins = (isNaN(remainingMins)) ? 0 : remainingMins;
 
                 if (shortened) {
                     return this.shortenETA(remainingMins);
                 }
 
-                return this.simplifyTime(remainingMins);
+                remainingMins = this.simplifyTime(remainingMins);
+                let displayText = `${ remainingMins } left before completing the book`;
+
+                return displayText += ` (Est. WPM: ${ parseInt(this.wpm) })`;
             },
 
             /**
@@ -170,16 +166,20 @@
                 this.total_logged_time = 0;
                 this.wpm = 0;
 
-                for (let log of this.readLogs) {
-                    let current_pages_read = log.pages_read;
-                    let logged_time_in_min = Math.floor((log.end_time - log.start_time) / 60);
+                if (this.readLogs.length > 0) {
+                    for (let log of this.readLogs) {
+                        let current_pages_read = log.pages_read;
+                        let logged_time_in_min = Math.floor((log.end_time - log.start_time) / 60);
 
-                    this.total_pages_read += current_pages_read;
-                    this.total_logged_time += logged_time_in_min;
-                    this.wpm += (current_pages_read * this.words_per_page) / logged_time_in_min;
+                        this.total_pages_read += current_pages_read;
+                        this.total_logged_time += logged_time_in_min;
+                        this.wpm += (current_pages_read * this.words_per_page) / logged_time_in_min;
+                    }
+
+                    this.wpm /= this.readLogs.length;
                 }
 
-                this.wpm /= this.readLogs.length;
+                this.$emit('totalReadUpdated', this.total_pages_read);
 
                 window.eventBus.$emit('share-logs', this.readLogs);
             }
